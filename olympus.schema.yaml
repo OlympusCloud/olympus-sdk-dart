@@ -1,0 +1,126 @@
+# olympus.yaml Schema Definition v1.0
+# Every app on Olympus Cloud has this file at repo root.
+# It declares what platform services the app uses.
+
+# ─── APP IDENTITY ─────────────────────────────────────
+app:
+  id: string          # Unique app ID (e.g., com.restaurant-revolution.pos)
+  name: string        # Display name
+  version: string     # Semantic version (1.0.0)
+  category: string    # restaurant | retail | salon | fitness | creator | workforce | voice | messaging | consumer | horizontal
+  description: string # One-line description for marketplace
+
+# ─── PLATFORM ─────────────────────────────────────────
+platform:
+  sdk_version: string   # Required SDK version (>=1.0.0)
+  min_api_version: string # Minimum API version (v1)
+
+# ─── SCOPES (what platform services this app accesses) ─
+scopes:
+  - string  # Format: service.resource:permission
+  # Examples:
+  # - auth.users:read
+  # - auth.users:write
+  # - commerce.orders:read
+  # - commerce.orders:write
+  # - commerce.menu:read
+  # - commerce.payments:process
+  # - ai.query:invoke
+  # - ai.agents:invoke
+  # - notify.push:send
+  # - notify.sms:send
+  # - events.subscribe:order.*
+  # - events.publish:custom.*
+  # - data.query:read
+  # - storage.files:write
+  # - marketplace.apps:read
+  # - billing.plans:read
+  # - gating.policies:read
+  # - devices.fleet:manage
+
+# ─── WEBHOOKS ─────────────────────────────────────────
+webhooks:
+  subscribe:   # Events this app receives
+    - event: string   # Event type (e.g., order.created)
+      url: string     # Relative URL in app (e.g., /webhooks/order)
+  publish:     # Events this app emits
+    - event: string   # Event type (e.g., voice.call.completed)
+      schema: string  # Path to JSON schema file
+
+# ─── MARKETPLACE ──────────────────────────────────────
+marketplace:
+  listing:
+    tagline: string        # Short description
+    screenshots: [string]  # Paths to screenshot images
+    pricing:
+      type: string         # free | subscription | usage | tiered
+      plans:
+        - name: string
+          price: integer   # cents/mo
+          interval: string # month | year
+    industries: [string]   # Target industries
+
+# ─── WHITE LABEL ──────────────────────────────────────
+white_label:
+  enabled: boolean         # Can this app be white-labeled by others?
+  embeddable: boolean      # Can be embedded as widget in other apps?
+  wholesale_price: integer # cents/mo charged to embedding app
+
+# ─── BRANDING ─────────────────────────────────────────
+branding:
+  name: string             # Display name
+  primary_color: string    # Hex color (#FF4500)
+  logo: string             # Path to logo SVG/PNG
+  favicon: string          # Path to favicon
+  domain: string           # Custom domain (restaurantrevolution.ai)
+
+# ─── PORTAL CUSTOMIZATION ─────────────────────────────
+portal:
+  sections:                # Show/hide Portal sections
+    operations: object     # {menu_management: true, kitchen_config: true, ...}
+    analytics: object      # {voice_agents: true, demand_forecast: true, ...}
+  custom_sections:         # App-specific screens injected into Portal
+    - id: string
+      label: string
+      icon: string         # Material icon name
+      screens:
+        - path: string
+          label: string
+  dashboard_widgets:       # Widgets on Portal dashboard
+    - type: string         # revenue_card | active_orders | voice_calls | custom
+
+# ─── AI AGENTS (custom) ──────────────────────────────
+agents:
+  - name: string           # Agent name (e.g., sommelier)
+    manifest: string       # Path to agent manifest YAML
+    model: string          # Default model (gemini-3-flash)
+    tools: [string]        # Platform tools the agent can use
+    rag_index: string      # RAG knowledge base name
+    marketplace: boolean   # List in marketplace for other apps?
+
+# ─── EDGE WORKERS (custom) ───────────────────────────
+workers:
+  - name: string           # Worker name
+    trigger: string        # route:/checkout/* | cron:0 * * * * | event:order.created
+    script: string         # Path to worker script
+    bindings:              # Cloudflare bindings
+      - type: string       # d1 | r2 | kv | vectorize
+        name: string       # Binding name
+
+# ─── UI EXTENSIONS ────────────────────────────────────
+ui_extensions:
+  - slot: string           # Predefined slot (pos.checkout.before_payment)
+    widget: string         # Path to Flutter widget file
+
+# ─── MANAGED SERVICES ─────────────────────────────────
+managed_services:
+  sales:
+    enabled: boolean
+    branding: string       # "Restaurant Revolution Sales"
+  support:
+    enabled: boolean
+    branding: string       # "Restaurant Revolution Support"
+    email: string          # help@restaurantrevolution.ai
+  payroll:
+    enabled: boolean
+    branding: string       # "Restaurant Revolution Payroll"

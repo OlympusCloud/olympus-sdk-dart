@@ -1,0 +1,137 @@
+# Restaurant Revolution — olympus.yaml
+# Casual dining, bars, nightclubs POS
+
+app:
+  id: com.restaurant-revolution.pos
+  name: Restaurant Revolution
+  version: 2.1.0
+  category: restaurant
+  description: AI-powered POS for restaurants, bars, and nightclubs
+
+platform:
+  sdk_version: ">=1.0.0"
+  min_api_version: v1
+
+scopes:
+  - auth.users:read
+  - auth.users:write
+  - commerce.orders:read
+  - commerce.orders:write
+  - commerce.menu:read
+  - commerce.menu:write
+  - commerce.customers:read
+  - commerce.customers:write
+  - commerce.inventory:read
+  - commerce.inventory:write
+  - commerce.payments:process
+  - commerce.tables:read
+  - commerce.tables:write
+  - commerce.checks:read
+  - commerce.checks:write
+  - ai.query:invoke
+  - ai.agents:invoke
+  - notify.push:send
+  - notify.sms:send
+  - events.subscribe:order.*
+  - events.subscribe:payment.*
+  - events.publish:rr.*
+  - data.query:read
+  - storage.files:write
+  - devices.fleet:manage
+  - analytics:read
+  - gating.policies:read
+
+webhooks:
+  subscribe:
+    - event: order.created
+      url: /webhooks/order-created
+    - event: payment.completed
+      url: /webhooks/payment-completed
+    - event: inventory.low_stock
+      url: /webhooks/low-stock
+  publish:
+    - event: rr.table.turned
+      schema: schemas/table_turned.json
+    - event: rr.shift.started
+      schema: schemas/shift_started.json
+
+marketplace:
+  listing:
+    tagline: "AI-powered POS for restaurants, bars, and nightclubs"
+    screenshots:
+      - assets/screenshots/dashboard.png
+      - assets/screenshots/order-entry.png
+      - assets/screenshots/floor-plan.png
+    pricing:
+      type: subscription
+      plans:
+        - name: Starter
+          price: 4900
+          interval: month
+        - name: Pro
+          price: 19900
+          interval: month
+        - name: Enterprise
+          price: 49900
+          interval: month
+    industries: [restaurant, bar, nightclub, brewpub]
+
+white_label:
+  enabled: true
+  embeddable: false
+  wholesale_price: 9900
+
+branding:
+  name: Restaurant Revolution
+  primary_color: "#FF4500"
+  logo: assets/rr-logo.svg
+  favicon: assets/rr-favicon.ico
+  domain: restaurantrevolution.ai
+
+portal:
+  sections:
+    operations:
+      menu_management: true
+      kitchen_config: true
+      catering: true
+      delivery: true
+      online_ordering: true
+    analytics:
+      voice_agents: true
+      demand_forecast: true
+  custom_sections:
+    - id: bar_management
+      label: "Bar & Nightlife"
+      icon: local_bar
+      screens:
+        - path: /bar/speed-rail
+          label: "Speed Rail"
+        - path: /bar/bottle-service
+          label: "Bottle Service"
+        - path: /bar/pour-tracking
+          label: "Pour Tracking"
+  dashboard_widgets:
+    - type: revenue_card
+    - type: active_orders
+    - type: table_overview
+    - type: voice_calls
+
+agents:
+  - name: rr-assistant
+    manifest: agents/rr-assistant/manifest.yaml
+    model: gemini-3-flash
+    tools: [menu.search, inventory.check, customer.preferences]
+    rag_index: restaurant-knowledge
+    marketplace: false
+
+managed_services:
+  sales:
+    enabled: true
+    branding: "Restaurant Revolution Sales"
+  support:
+    enabled: true
+    branding: "Restaurant Revolution Support"
+    email: help@restaurantrevolution.ai
+  payroll:
+    enabled: true
+    branding: "Restaurant Revolution Payroll"
