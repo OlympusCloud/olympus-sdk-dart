@@ -147,6 +147,8 @@ class CatalogItem {
     this.imageUrl,
     this.modifiers,
     this.available,
+    this.tags = const [],
+    this.metadata,
     this.createdAt,
     this.updatedAt,
   });
@@ -162,8 +164,18 @@ class CatalogItem {
   final String? imageUrl;
   final List<CatalogModifier>? modifiers;
   final bool? available;
+
+  /// Tags for filtering (e.g., dietary: "vegetarian", "vegan", "gluten_free").
+  final List<String> tags;
+
+  /// Arbitrary metadata (e.g., calories, allergens).
+  final Map<String, dynamic>? metadata;
+
   final DateTime? createdAt;
   final DateTime? updatedAt;
+
+  /// Alias for [price] used by screens expecting `priceCents`.
+  int get priceCents => price;
 
   factory CatalogItem.fromJson(Map<String, dynamic> json) => CatalogItem(
         id: json['id'] as String,
@@ -177,6 +189,11 @@ class CatalogItem {
             ?.map((e) => CatalogModifier.fromJson(e as Map<String, dynamic>))
             .toList(),
         available: json['available'] as bool?,
+        tags: (json['tags'] as List<dynamic>?)
+                ?.map((e) => e as String)
+                .toList() ??
+            [],
+        metadata: json['metadata'] as Map<String, dynamic>?,
         createdAt: json['created_at'] != null
             ? DateTime.parse(json['created_at'] as String)
             : null,
@@ -196,6 +213,8 @@ class CatalogItem {
         if (modifiers != null)
           'modifiers': modifiers!.map((e) => e.toJson()).toList(),
         if (available != null) 'available': available,
+        if (tags.isNotEmpty) 'tags': tags,
+        if (metadata != null) 'metadata': metadata,
         if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
         if (updatedAt != null) 'updated_at': updatedAt!.toIso8601String(),
       };

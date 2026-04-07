@@ -53,6 +53,16 @@ class OlympusAuthService {
     return User.fromJson(json);
   }
 
+  /// Get the current auth session, or null if not logged in.
+  Future<AuthSession?> currentSession() async {
+    try {
+      final json = await _http.get('/auth/session');
+      return AuthSession.fromJson(json);
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Refresh the access token using a refresh token.
   Future<AuthSession> refresh(String refreshToken) async {
     final json = await _http.post('/auth/refresh', data: {

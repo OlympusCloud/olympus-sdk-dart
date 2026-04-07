@@ -34,6 +34,11 @@ class OlympusCommerceService {
     return Order.fromJson(json);
   }
 
+  /// Add an item to an existing order.
+  Future<void> addItemToOrder(String orderId, Map<String, dynamic> item) async {
+    await _http.post('/commerce/orders/$orderId/items', data: item);
+  }
+
   /// Retrieve a single order by ID.
   Future<Order> getOrder(String orderId) async {
     final json = await _http.get('/commerce/orders/$orderId');
