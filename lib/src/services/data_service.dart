@@ -17,13 +17,12 @@ class OlympusDataService {
     String sql, {
     Map<String, dynamic>? params,
   }) async {
-    final json = await _http.post('/data/query', data: {
-      'sql': sql,
-      'params': ?params,
-    });
-    final rows = json['rows'] as List<dynamic>? ??
-        json['data'] as List<dynamic>? ??
-        [];
+    final json = await _http.post(
+      '/data/query',
+      data: {'sql': sql, 'params': ?params},
+    );
+    final rows =
+        json['rows'] as List<dynamic>? ?? json['data'] as List<dynamic>? ?? [];
     return rows.cast<Map<String, dynamic>>();
   }
 
@@ -57,11 +56,10 @@ class OlympusDataService {
     String? scope,
     int? limit,
   }) async {
-    final json = await _http.post('/ai/search', data: {
-      'query': query,
-      'scope': ?scope,
-      'limit': ?limit,
-    });
+    final json = await _http.post(
+      '/ai/search',
+      data: {'query': query, 'scope': ?scope, 'limit': ?limit},
+    );
     final results = json['results'] as List<dynamic>? ?? [];
     return results
         .map((e) => SearchResult.fromJson(e as Map<String, dynamic>))

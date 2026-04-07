@@ -29,13 +29,16 @@ class OlympusAiService {
     String? tier,
     Map<String, dynamic>? context,
   }) async {
-    final json = await _http.post('/ai/chat', data: {
-      'messages': [
-        {'role': 'user', 'content': prompt}
-      ],
-      'tier': ?tier,
-      'context': ?context,
-    });
+    final json = await _http.post(
+      '/ai/chat',
+      data: {
+        'messages': [
+          {'role': 'user', 'content': prompt},
+        ],
+        'tier': ?tier,
+        'context': ?context,
+      },
+    );
     return AiResponse.fromJson(json);
   }
 
@@ -48,11 +51,10 @@ class OlympusAiService {
     String? model,
     bool stream = false,
   }) async {
-    final json = await _http.post('/ai/chat', data: {
-      'messages': messages,
-      'model': ?model,
-      'stream': stream,
-    });
+    final json = await _http.post(
+      '/ai/chat',
+      data: {'messages': messages, 'model': ?model, 'stream': stream},
+    );
     return AiResponse.fromJson(json);
   }
 
@@ -60,10 +62,7 @@ class OlympusAiService {
   ///
   /// Returns a broadcast [Stream] of content delta strings. The caller is
   /// responsible for listening and handling completion.
-  Stream<String> stream(
-    String prompt, {
-    void Function(String chunk)? onChunk,
-  }) {
+  Stream<String> stream(String prompt, {void Function(String chunk)? onChunk}) {
     final controller = StreamController<String>.broadcast();
 
     _streamRequest(prompt, controller, onChunk);
@@ -81,7 +80,7 @@ class OlympusAiService {
         '/ai/chat',
         data: {
           'messages': [
-            {'role': 'user', 'content': prompt}
+            {'role': 'user', 'content': prompt},
           ],
           'stream': true,
         },
@@ -94,18 +93,19 @@ class OlympusAiService {
         return;
       }
 
-      await for (final chunk in stream
-          .transform(StreamTransformer<Uint8List, String>.fromHandlers(
-        handleData: (data, sink) => sink.add(utf8.decode(data)),
-      ))) {
+      await for (final chunk in stream.transform(
+        StreamTransformer<Uint8List, String>.fromHandlers(
+          handleData: (data, sink) => sink.add(utf8.decode(data)),
+        ),
+      )) {
         // SSE format: data: {...}\n\n
         for (final line in chunk.split('\n')) {
           if (line.startsWith('data: ') && line != 'data: [DONE]') {
             final payload = line.substring(6);
             try {
               final parsed = json.decode(payload) as Map<String, dynamic>;
-              final content = parsed['choices']?[0]?['delta']?['content']
-                      as String? ??
+              final content =
+                  parsed['choices']?[0]?['delta']?['content'] as String? ??
                   parsed['content'] as String? ??
                   '';
               if (content.isNotEmpty) {
@@ -135,11 +135,10 @@ class OlympusAiService {
     String task, {
     Map<String, dynamic>? params,
   }) async {
-    final json = await _http.post('/agent/invoke', data: {
-      'agent': agentName,
-      'task': task,
-      'params': ?params,
-    });
+    final json = await _http.post(
+      '/agent/invoke',
+      data: {'agent': agentName, 'task': task, 'params': ?params},
+    );
     return AgentResult.fromJson(json);
   }
 
@@ -150,12 +149,15 @@ class OlympusAiService {
     bool? requiresApproval,
     bool? notifyOnComplete,
   }) async {
-    final json = await _http.post('/agent/tasks', data: {
-      'agent': agent,
-      'task': task,
-      'requires_approval': ?requiresApproval,
-      'notify_on_complete': ?notifyOnComplete,
-    });
+    final json = await _http.post(
+      '/agent/tasks',
+      data: {
+        'agent': agent,
+        'task': task,
+        'requires_approval': ?requiresApproval,
+        'notify_on_complete': ?notifyOnComplete,
+      },
+    );
     return AgentTask.fromJson(json);
   }
 
@@ -171,9 +173,7 @@ class OlympusAiService {
 
   /// Generate an embedding vector for [text].
   Future<List<double>> embed(String text) async {
-    final json = await _http.post('/ai/embeddings', data: {
-      'input': text,
-    });
+    final json = await _http.post('/ai/embeddings', data: {'input': text});
     final data = json['data'] as List<dynamic>?;
     if (data != null && data.isNotEmpty) {
       final embedding = data[0]['embedding'] as List<dynamic>?;
@@ -189,11 +189,10 @@ class OlympusAiService {
     String? index,
     int? limit,
   }) async {
-    final json = await _http.post('/ai/search', data: {
-      'query': query,
-      'index': ?index,
-      'limit': ?limit,
-    });
+    final json = await _http.post(
+      '/ai/search',
+      data: {'query': query, 'index': ?index, 'limit': ?limit},
+    );
     final results = json['results'] as List<dynamic>? ?? [];
     return results
         .map((e) => SearchResult.fromJson(e as Map<String, dynamic>))
@@ -206,18 +205,16 @@ class OlympusAiService {
 
   /// Classify text into categories.
   Future<Classification> classify(String text) async {
-    final json = await _http.post('/ai/classify', data: {
-      'text': text,
-    });
+    final json = await _http.post('/ai/classify', data: {'text': text});
     return Classification.fromJson(json);
   }
 
   /// Translate text to [targetLang] (ISO 639-1 code).
   Future<String> translate(String text, String targetLang) async {
-    final json = await _http.post('/translation/translate', data: {
-      'text': text,
-      'target_language': targetLang,
-    });
+    final json = await _http.post(
+      '/translation/translate',
+      data: {'text': text, 'target_language': targetLang},
+    );
     return json['translated_text'] as String? ??
         json['translation'] as String? ??
         '';
@@ -225,9 +222,7 @@ class OlympusAiService {
 
   /// Analyze sentiment of text.
   Future<SentimentResult> sentiment(String text) async {
-    final json = await _http.post('/ai/sentiment', data: {
-      'text': text,
-    });
+    final json = await _http.post('/ai/sentiment', data: {'text': text});
     return SentimentResult.fromJson(json);
   }
 
@@ -237,18 +232,19 @@ class OlympusAiService {
 
   /// Speech-to-text: transcribe audio bytes.
   Future<String> stt(List<int> audioBytes) async {
-    final json = await _http.post('/ai/stt', data: {
-      'audio': base64Encode(audioBytes),
-    });
+    final json = await _http.post(
+      '/ai/stt',
+      data: {'audio': base64Encode(audioBytes)},
+    );
     return json['text'] as String? ?? json['transcript'] as String? ?? '';
   }
 
   /// Text-to-speech: synthesize audio bytes from text.
   Future<List<int>> tts(String text, {String? voiceId}) async {
-    final json = await _http.post('/ai/tts', data: {
-      'text': text,
-      'voice_id': ?voiceId,
-    });
+    final json = await _http.post(
+      '/ai/tts',
+      data: {'text': text, 'voice_id': ?voiceId},
+    );
     final audioBase64 = json['audio'] as String?;
     if (audioBase64 != null) {
       return base64Decode(audioBase64);

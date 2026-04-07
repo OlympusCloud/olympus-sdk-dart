@@ -16,12 +16,15 @@ class OlympusMarketplaceService {
     String? query,
     int? limit,
   }) async {
-    final json = await _http.get('/marketplace/apps', queryParameters: {
-      'category': ?category,
-      'industry': ?industry,
-      'q': ?query,
-      'limit': ?limit,
-    });
+    final json = await _http.get(
+      '/marketplace/apps',
+      queryParameters: {
+        'category': ?category,
+        'industry': ?industry,
+        'q': ?query,
+        'limit': ?limit,
+      },
+    );
     final items =
         json['apps'] as List<dynamic>? ?? json['data'] as List<dynamic>? ?? [];
     return items
@@ -49,7 +52,8 @@ class OlympusMarketplaceService {
   /// List apps currently installed for the tenant.
   Future<List<Installation>> getInstalled() async {
     final json = await _http.get('/marketplace/installed');
-    final items = json['installations'] as List<dynamic>? ??
+    final items =
+        json['installations'] as List<dynamic>? ??
         json['data'] as List<dynamic>? ??
         [];
     return items
@@ -59,9 +63,9 @@ class OlympusMarketplaceService {
 
   /// Submit a review for a marketplace app.
   Future<void> review(String appId, int rating, String text) async {
-    await _http.post('/marketplace/apps/$appId/reviews', data: {
-      'rating': rating,
-      'text': text,
-    });
+    await _http.post(
+      '/marketplace/apps/$appId/reviews',
+      data: {'rating': rating, 'text': text},
+    );
   }
 }

@@ -43,11 +43,7 @@ class OlympusClient {
     required String appId,
     required String apiKey,
     OlympusConfig? config,
-  }) : _config = config ??
-            OlympusConfig(
-              appId: appId,
-              apiKey: apiKey,
-            ) {
+  }) : _config = config ?? OlympusConfig(appId: appId, apiKey: apiKey) {
     _http = OlympusHttpClient(_config);
   }
 

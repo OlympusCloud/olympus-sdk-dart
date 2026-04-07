@@ -25,8 +25,7 @@ class TraceHandle {
   DateTime? get endedAt => _endedAt;
 
   /// The elapsed duration, measured from start to now (if active) or to end.
-  Duration get elapsed =>
-      (_endedAt ?? DateTime.now()).difference(startedAt);
+  Duration get elapsed => (_endedAt ?? DateTime.now()).difference(startedAt);
 
   /// End this trace span and report its duration.
   Future<void> end() async {

@@ -25,12 +25,15 @@ class OlympusCommerceService {
     String? tableId,
     String? customerId,
   }) async {
-    final json = await _http.post('/commerce/orders', data: {
-      'items': items.map((e) => e.toJson()).toList(),
-      'source': source,
-      'table_id': ?tableId,
-      'customer_id': ?customerId,
-    });
+    final json = await _http.post(
+      '/commerce/orders',
+      data: {
+        'items': items.map((e) => e.toJson()).toList(),
+        'source': source,
+        'table_id': ?tableId,
+        'customer_id': ?customerId,
+      },
+    );
     return Order.fromJson(json);
   }
 
@@ -51,27 +54,28 @@ class OlympusCommerceService {
     int? limit,
     String? status,
   }) async {
-    final json = await _http.get('/commerce/orders', queryParameters: {
-      'page': ?page,
-      'limit': ?limit,
-      'status': ?status,
-    });
+    final json = await _http.get(
+      '/commerce/orders',
+      queryParameters: {'page': ?page, 'limit': ?limit, 'status': ?status},
+    );
     return PaginatedResponse.fromJson(json, Order.fromJson);
   }
 
   /// Update the status of an order (e.g., "preparing", "ready", "completed").
   Future<Order> updateOrderStatus(String orderId, String status) async {
-    final json = await _http.patch('/commerce/orders/$orderId/status', data: {
-      'status': status,
-    });
+    final json = await _http.patch(
+      '/commerce/orders/$orderId/status',
+      data: {'status': status},
+    );
     return Order.fromJson(json);
   }
 
   /// Cancel an order with a reason.
   Future<void> cancelOrder(String orderId, String reason) async {
-    await _http.post('/commerce/orders/$orderId/cancel', data: {
-      'reason': reason,
-    });
+    await _http.post(
+      '/commerce/orders/$orderId/cancel',
+      data: {'reason': reason},
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -87,25 +91,28 @@ class OlympusCommerceService {
     String? description,
     String? imageUrl,
   }) async {
-    final json = await _http.post('/central-menu/items', data: {
-      'name': name,
-      'price': price,
-      'category': ?category,
-      'modifiers': ?modifiers?.map((e) => e.toJson()).toList(),
-      'description': ?description,
-      'image_url': ?imageUrl,
-    });
+    final json = await _http.post(
+      '/central-menu/items',
+      data: {
+        'name': name,
+        'price': price,
+        'category': ?category,
+        'modifiers': ?modifiers?.map((e) => e.toJson()).toList(),
+        'description': ?description,
+        'image_url': ?imageUrl,
+      },
+    );
     return CatalogItem.fromJson(json);
   }
 
   /// Retrieve the catalog, optionally filtered by category.
   Future<List<CatalogItem>> getCatalog({String? categoryId}) async {
-    final json = await _http.get('/central-menu/items', queryParameters: {
-      'category_id': ?categoryId,
-    });
-    final items = json['items'] as List<dynamic>? ??
-        json['data'] as List<dynamic>? ??
-        [];
+    final json = await _http.get(
+      '/central-menu/items',
+      queryParameters: {'category_id': ?categoryId},
+    );
+    final items =
+        json['items'] as List<dynamic>? ?? json['data'] as List<dynamic>? ?? [];
     return items
         .map((e) => CatalogItem.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -126,13 +133,16 @@ class OlympusCommerceService {
     String? description,
     bool? available,
   }) async {
-    final json = await _http.patch('/central-menu/items/$itemId', data: {
-      'name': ?name,
-      'price': ?price,
-      'category': ?category,
-      'description': ?description,
-      'available': ?available,
-    });
+    final json = await _http.patch(
+      '/central-menu/items/$itemId',
+      data: {
+        'name': ?name,
+        'price': ?price,
+        'category': ?category,
+        'description': ?description,
+        'available': ?available,
+      },
+    );
     return CatalogItem.fromJson(json);
   }
 

@@ -79,10 +79,10 @@ class OlympusEventsService {
 
   /// Publish an event to the platform event bus.
   Future<void> publish(String eventType, Map<String, dynamic> data) async {
-    await _http.post('/events/publish', data: {
-      'event_type': eventType,
-      'data': data,
-    });
+    await _http.post(
+      '/events/publish',
+      data: {'event_type': eventType, 'data': data},
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -94,32 +94,34 @@ class OlympusEventsService {
     String url,
     List<String> events,
   ) async {
-    final json =
-        await _http.post('/platform/tenants/me/webhooks', data: {
-      'url': url,
-      'events': events,
-    });
+    final json = await _http.post(
+      '/platform/tenants/me/webhooks',
+      data: {'url': url, 'events': events},
+    );
     return WebhookRegistration.fromJson(json);
   }
 
   /// Send a test webhook payload for a given event type.
   Future<void> webhookTest(String eventType) async {
-    await _http.post('/platform/tenants/me/webhooks/test', data: {
-      'event_type': eventType,
-    });
+    await _http.post(
+      '/platform/tenants/me/webhooks/test',
+      data: {'event_type': eventType},
+    );
   }
 
   /// Replay a previously delivered event by its ID.
   Future<void> webhookReplay(String eventId) async {
-    await _http.post('/platform/tenants/me/webhooks/replay', data: {
-      'event_id': eventId,
-    });
+    await _http.post(
+      '/platform/tenants/me/webhooks/replay',
+      data: {'event_id': eventId},
+    );
   }
 
   /// List registered webhooks.
   Future<List<WebhookRegistration>> listWebhooks() async {
     final json = await _http.get('/platform/tenants/me/webhooks');
-    final items = json['webhooks'] as List<dynamic>? ??
+    final items =
+        json['webhooks'] as List<dynamic>? ??
         json['data'] as List<dynamic>? ??
         [];
     return items

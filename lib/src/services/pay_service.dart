@@ -34,16 +34,11 @@ class OlympusPayService {
   ///
   /// [amount] is in cents. [method] is a payment method token or ID
   /// (e.g., a Stripe payment method ID or "cash").
-  Future<Payment> charge(
-    String orderId,
-    int amount,
-    String method,
-  ) async {
-    final json = await _http.post('/payments/intents', data: {
-      'order_id': orderId,
-      'amount': amount,
-      'payment_method': method,
-    });
+  Future<Payment> charge(String orderId, int amount, String method) async {
+    final json = await _http.post(
+      '/payments/intents',
+      data: {'order_id': orderId, 'amount': amount, 'payment_method': method},
+    );
     return Payment.fromJson(json);
   }
 
@@ -60,15 +55,11 @@ class OlympusPayService {
   /// Refund a payment, optionally partially.
   ///
   /// If [amount] is null the full payment is refunded.
-  Future<Refund> refund(
-    String paymentId, {
-    int? amount,
-    String? reason,
-  }) async {
-    final json = await _http.post('/payments/$paymentId/refund', data: {
-      'amount': ?amount,
-      'reason': ?reason,
-    });
+  Future<Refund> refund(String paymentId, {int? amount, String? reason}) async {
+    final json = await _http.post(
+      '/payments/$paymentId/refund',
+      data: {'amount': ?amount, 'reason': ?reason},
+    );
     return Refund.fromJson(json);
   }
 
@@ -92,13 +83,16 @@ class OlympusPayService {
     String? method,
     String? description,
   }) async {
-    final json = await _http.post('/finance/payouts', data: {
-      'amount': amount,
-      'destination': destination,
-      'currency': ?currency,
-      'method': ?method,
-      'description': ?description,
-    });
+    final json = await _http.post(
+      '/finance/payouts',
+      data: {
+        'amount': amount,
+        'destination': destination,
+        'currency': ?currency,
+        'method': ?method,
+        'description': ?description,
+      },
+    );
     return Payout.fromJson(json);
   }
 
@@ -115,12 +109,12 @@ class OlympusPayService {
     int? limit,
     String? status,
   }) async {
-    final json = await _http.get('/payments', queryParameters: {
-      'page': ?page,
-      'limit': ?limit,
-      'status': ?status,
-    });
-    final items = json['payments'] as List<dynamic>? ??
+    final json = await _http.get(
+      '/payments',
+      queryParameters: {'page': ?page, 'limit': ?limit, 'status': ?status},
+    );
+    final items =
+        json['payments'] as List<dynamic>? ??
         json['data'] as List<dynamic>? ??
         [];
     return items
@@ -141,11 +135,14 @@ class OlympusPayService {
     required String registrationCode,
     String? label,
   }) async {
-    final json = await _http.post('/stripe/terminal/readers', data: {
-      'location_id': locationId,
-      'registration_code': registrationCode,
-      'label': ?label,
-    });
+    final json = await _http.post(
+      '/stripe/terminal/readers',
+      data: {
+        'location_id': locationId,
+        'registration_code': registrationCode,
+        'label': ?label,
+      },
+    );
     return TerminalReader.fromJson(json);
   }
 

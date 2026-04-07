@@ -20,26 +20,27 @@ class AiResponse {
   final String? requestId;
 
   factory AiResponse.fromJson(Map<String, dynamic> json) => AiResponse(
-        content: json['content'] as String? ??
-            json['response'] as String? ??
-            json['text'] as String? ??
-            '',
-        model: json['model'] as String?,
-        tier: json['tier'] as String?,
-        tokensUsed: json['tokens_used'] as int? ??
-            json['usage']?['total_tokens'] as int?,
-        finishReason: json['finish_reason'] as String?,
-        requestId: json['request_id'] as String?,
-      );
+    content:
+        json['content'] as String? ??
+        json['response'] as String? ??
+        json['text'] as String? ??
+        '',
+    model: json['model'] as String?,
+    tier: json['tier'] as String?,
+    tokensUsed:
+        json['tokens_used'] as int? ?? json['usage']?['total_tokens'] as int?,
+    finishReason: json['finish_reason'] as String?,
+    requestId: json['request_id'] as String?,
+  );
 
   Map<String, dynamic> toJson() => {
-        'content': content,
-        if (model != null) 'model': model,
-        if (tier != null) 'tier': tier,
-        if (tokensUsed != null) 'tokens_used': tokensUsed,
-        if (finishReason != null) 'finish_reason': finishReason,
-        if (requestId != null) 'request_id': requestId,
-      };
+    'content': content,
+    if (model != null) 'model': model,
+    if (tier != null) 'tier': tier,
+    if (tokensUsed != null) 'tokens_used': tokensUsed,
+    if (finishReason != null) 'finish_reason': finishReason,
+    if (requestId != null) 'request_id': requestId,
+  };
 }
 
 /// Result from invoking a LangGraph agent.
@@ -59,47 +60,43 @@ class AgentResult {
   final String? requestId;
 
   factory AgentResult.fromJson(Map<String, dynamic> json) => AgentResult(
-        output: json['output'] as String? ?? json['result'] as String? ?? '',
-        agentName: json['agent_name'] as String?,
-        steps: (json['steps'] as List<dynamic>?)
-            ?.map((e) => AgentStep.fromJson(e as Map<String, dynamic>))
-            .toList(),
-        tokensUsed: json['tokens_used'] as int?,
-        requestId: json['request_id'] as String?,
-      );
+    output: json['output'] as String? ?? json['result'] as String? ?? '',
+    agentName: json['agent_name'] as String?,
+    steps: (json['steps'] as List<dynamic>?)
+        ?.map((e) => AgentStep.fromJson(e as Map<String, dynamic>))
+        .toList(),
+    tokensUsed: json['tokens_used'] as int?,
+    requestId: json['request_id'] as String?,
+  );
 
   Map<String, dynamic> toJson() => {
-        'output': output,
-        if (agentName != null) 'agent_name': agentName,
-        if (steps != null) 'steps': steps!.map((e) => e.toJson()).toList(),
-        if (tokensUsed != null) 'tokens_used': tokensUsed,
-        if (requestId != null) 'request_id': requestId,
-      };
+    'output': output,
+    if (agentName != null) 'agent_name': agentName,
+    if (steps != null) 'steps': steps!.map((e) => e.toJson()).toList(),
+    if (tokensUsed != null) 'tokens_used': tokensUsed,
+    if (requestId != null) 'request_id': requestId,
+  };
 }
 
 /// A single step executed by an agent during task processing.
 class AgentStep {
-  const AgentStep({
-    required this.action,
-    this.observation,
-    this.thought,
-  });
+  const AgentStep({required this.action, this.observation, this.thought});
 
   final String action;
   final String? observation;
   final String? thought;
 
   factory AgentStep.fromJson(Map<String, dynamic> json) => AgentStep(
-        action: json['action'] as String,
-        observation: json['observation'] as String?,
-        thought: json['thought'] as String?,
-      );
+    action: json['action'] as String,
+    observation: json['observation'] as String?,
+    thought: json['thought'] as String?,
+  );
 
   Map<String, dynamic> toJson() => {
-        'action': action,
-        if (observation != null) 'observation': observation,
-        if (thought != null) 'thought': thought,
-      };
+    'action': action,
+    if (observation != null) 'observation': observation,
+    if (thought != null) 'thought': thought,
+  };
 }
 
 /// An asynchronous agent task with status tracking.
@@ -125,31 +122,30 @@ class AgentTask {
   final DateTime? completedAt;
 
   factory AgentTask.fromJson(Map<String, dynamic> json) => AgentTask(
-        id: json['id'] as String? ?? json['task_id'] as String? ?? '',
-        status: json['status'] as String? ?? 'unknown',
-        agentName: json['agent_name'] as String? ?? json['agent'] as String?,
-        task: json['task'] as String?,
-        result: json['result'] as String?,
-        error: json['error'] as String?,
-        createdAt: json['created_at'] != null
-            ? DateTime.parse(json['created_at'] as String)
-            : null,
-        completedAt: json['completed_at'] != null
-            ? DateTime.parse(json['completed_at'] as String)
-            : null,
-      );
+    id: json['id'] as String? ?? json['task_id'] as String? ?? '',
+    status: json['status'] as String? ?? 'unknown',
+    agentName: json['agent_name'] as String? ?? json['agent'] as String?,
+    task: json['task'] as String?,
+    result: json['result'] as String?,
+    error: json['error'] as String?,
+    createdAt: json['created_at'] != null
+        ? DateTime.parse(json['created_at'] as String)
+        : null,
+    completedAt: json['completed_at'] != null
+        ? DateTime.parse(json['completed_at'] as String)
+        : null,
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'status': status,
-        if (agentName != null) 'agent_name': agentName,
-        if (task != null) 'task': task,
-        if (result != null) 'result': result,
-        if (error != null) 'error': error,
-        if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
-        if (completedAt != null)
-          'completed_at': completedAt!.toIso8601String(),
-      };
+    'id': id,
+    'status': status,
+    if (agentName != null) 'agent_name': agentName,
+    if (task != null) 'task': task,
+    if (result != null) 'result': result,
+    if (error != null) 'error': error,
+    if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
+    if (completedAt != null) 'completed_at': completedAt!.toIso8601String(),
+  };
 
   bool get isCompleted => status == 'completed';
   bool get isFailed => status == 'failed';
@@ -169,20 +165,21 @@ class Classification {
   final Map<String, double>? scores;
 
   factory Classification.fromJson(Map<String, dynamic> json) => Classification(
-        label: json['label'] as String? ?? json['category'] as String? ?? '',
-        confidence: (json['confidence'] as num?)?.toDouble() ??
-            (json['score'] as num?)?.toDouble() ??
-            0.0,
-        scores: (json['scores'] as Map<String, dynamic>?)?.map(
-          (k, v) => MapEntry(k, (v as num).toDouble()),
-        ),
-      );
+    label: json['label'] as String? ?? json['category'] as String? ?? '',
+    confidence:
+        (json['confidence'] as num?)?.toDouble() ??
+        (json['score'] as num?)?.toDouble() ??
+        0.0,
+    scores: (json['scores'] as Map<String, dynamic>?)?.map(
+      (k, v) => MapEntry(k, (v as num).toDouble()),
+    ),
+  );
 
   Map<String, dynamic> toJson() => {
-        'label': label,
-        'confidence': confidence,
-        if (scores != null) 'scores': scores,
-      };
+    'label': label,
+    'confidence': confidence,
+    if (scores != null) 'scores': scores,
+  };
 }
 
 /// Sentiment analysis result.
@@ -208,11 +205,10 @@ class SentimentResult {
       );
 
   Map<String, dynamic> toJson() => {
-        'sentiment': sentiment,
-        'score': score,
-        if (aspects != null)
-          'aspects': aspects!.map((e) => e.toJson()).toList(),
-      };
+    'sentiment': sentiment,
+    'score': score,
+    if (aspects != null) 'aspects': aspects!.map((e) => e.toJson()).toList(),
+  };
 }
 
 /// Sentiment for a specific aspect of the analyzed text.
@@ -235,8 +231,8 @@ class AspectSentiment {
       );
 
   Map<String, dynamic> toJson() => {
-        'aspect': aspect,
-        'sentiment': sentiment,
-        'score': score,
-      };
+    'aspect': aspect,
+    'sentiment': sentiment,
+    'score': score,
+  };
 }

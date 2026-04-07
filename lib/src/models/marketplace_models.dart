@@ -30,34 +30,34 @@ class MarketplaceApp {
   final DateTime? createdAt;
 
   factory MarketplaceApp.fromJson(Map<String, dynamic> json) => MarketplaceApp(
-        id: json['id'] as String,
-        name: json['name'] as String,
-        description: json['description'] as String?,
-        category: json['category'] as String?,
-        industry: json['industry'] as String?,
-        developer: json['developer'] as String?,
-        iconUrl: json['icon_url'] as String?,
-        rating: (json['rating'] as num?)?.toDouble(),
-        installCount: json['install_count'] as int?,
-        pricing: json['pricing'] as String?,
-        createdAt: json['created_at'] != null
-            ? DateTime.parse(json['created_at'] as String)
-            : null,
-      );
+    id: json['id'] as String,
+    name: json['name'] as String,
+    description: json['description'] as String?,
+    category: json['category'] as String?,
+    industry: json['industry'] as String?,
+    developer: json['developer'] as String?,
+    iconUrl: json['icon_url'] as String?,
+    rating: (json['rating'] as num?)?.toDouble(),
+    installCount: json['install_count'] as int?,
+    pricing: json['pricing'] as String?,
+    createdAt: json['created_at'] != null
+        ? DateTime.parse(json['created_at'] as String)
+        : null,
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        if (description != null) 'description': description,
-        if (category != null) 'category': category,
-        if (industry != null) 'industry': industry,
-        if (developer != null) 'developer': developer,
-        if (iconUrl != null) 'icon_url': iconUrl,
-        if (rating != null) 'rating': rating,
-        if (installCount != null) 'install_count': installCount,
-        if (pricing != null) 'pricing': pricing,
-        if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
-      };
+    'id': id,
+    'name': name,
+    if (description != null) 'description': description,
+    if (category != null) 'category': category,
+    if (industry != null) 'industry': industry,
+    if (developer != null) 'developer': developer,
+    if (iconUrl != null) 'icon_url': iconUrl,
+    if (rating != null) 'rating': rating,
+    if (installCount != null) 'install_count': installCount,
+    if (pricing != null) 'pricing': pricing,
+    if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
+  };
 }
 
 /// An installed marketplace app instance for a tenant.
@@ -79,23 +79,22 @@ class Installation {
   final DateTime? installedAt;
 
   factory Installation.fromJson(Map<String, dynamic> json) => Installation(
-        id: json['id'] as String? ?? json['installation_id'] as String? ?? '',
-        appId: json['app_id'] as String,
-        appName: json['app_name'] as String?,
-        status: json['status'] as String?,
-        config: json['config'] as Map<String, dynamic>?,
-        installedAt: json['installed_at'] != null
-            ? DateTime.parse(json['installed_at'] as String)
-            : null,
-      );
+    id: json['id'] as String? ?? json['installation_id'] as String? ?? '',
+    appId: json['app_id'] as String,
+    appName: json['app_name'] as String?,
+    status: json['status'] as String?,
+    config: json['config'] as Map<String, dynamic>?,
+    installedAt: json['installed_at'] != null
+        ? DateTime.parse(json['installed_at'] as String)
+        : null,
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'app_id': appId,
-        if (appName != null) 'app_name': appName,
-        if (status != null) 'status': status,
-        if (config != null) 'config': config,
-        if (installedAt != null)
-          'installed_at': installedAt!.toIso8601String(),
-      };
+    'id': id,
+    'app_id': appId,
+    if (appName != null) 'app_name': appName,
+    if (status != null) 'status': status,
+    if (config != null) 'config': config,
+    if (installedAt != null) 'installed_at': installedAt!.toIso8601String(),
+  };
 }

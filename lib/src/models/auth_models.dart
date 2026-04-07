@@ -22,26 +22,24 @@ class AuthSession {
   final List<String>? roles;
 
   factory AuthSession.fromJson(Map<String, dynamic> json) => AuthSession(
-        accessToken: json['access_token'] as String,
-        tokenType: json['token_type'] as String? ?? 'Bearer',
-        expiresIn: json['expires_in'] as int? ?? 3600,
-        refreshToken: json['refresh_token'] as String?,
-        userId: json['user_id'] as String?,
-        tenantId: json['tenant_id'] as String?,
-        roles: (json['roles'] as List<dynamic>?)
-            ?.map((e) => e as String)
-            .toList(),
-      );
+    accessToken: json['access_token'] as String,
+    tokenType: json['token_type'] as String? ?? 'Bearer',
+    expiresIn: json['expires_in'] as int? ?? 3600,
+    refreshToken: json['refresh_token'] as String?,
+    userId: json['user_id'] as String?,
+    tenantId: json['tenant_id'] as String?,
+    roles: (json['roles'] as List<dynamic>?)?.map((e) => e as String).toList(),
+  );
 
   Map<String, dynamic> toJson() => {
-        'access_token': accessToken,
-        'token_type': tokenType,
-        'expires_in': expiresIn,
-        if (refreshToken != null) 'refresh_token': refreshToken,
-        if (userId != null) 'user_id': userId,
-        if (tenantId != null) 'tenant_id': tenantId,
-        if (roles != null) 'roles': roles,
-      };
+    'access_token': accessToken,
+    'token_type': tokenType,
+    'expires_in': expiresIn,
+    if (refreshToken != null) 'refresh_token': refreshToken,
+    if (userId != null) 'user_id': userId,
+    if (tenantId != null) 'tenant_id': tenantId,
+    if (roles != null) 'roles': roles,
+  };
 }
 
 /// A platform user.
@@ -67,32 +65,30 @@ class User {
   final DateTime? updatedAt;
 
   factory User.fromJson(Map<String, dynamic> json) => User(
-        id: json['id'] as String,
-        email: json['email'] as String,
-        name: json['name'] as String?,
-        roles: (json['roles'] as List<dynamic>?)
-            ?.map((e) => e as String)
-            .toList(),
-        tenantId: json['tenant_id'] as String?,
-        status: json['status'] as String?,
-        createdAt: json['created_at'] != null
-            ? DateTime.parse(json['created_at'] as String)
-            : null,
-        updatedAt: json['updated_at'] != null
-            ? DateTime.parse(json['updated_at'] as String)
-            : null,
-      );
+    id: json['id'] as String,
+    email: json['email'] as String,
+    name: json['name'] as String?,
+    roles: (json['roles'] as List<dynamic>?)?.map((e) => e as String).toList(),
+    tenantId: json['tenant_id'] as String?,
+    status: json['status'] as String?,
+    createdAt: json['created_at'] != null
+        ? DateTime.parse(json['created_at'] as String)
+        : null,
+    updatedAt: json['updated_at'] != null
+        ? DateTime.parse(json['updated_at'] as String)
+        : null,
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'email': email,
-        if (name != null) 'name': name,
-        if (roles != null) 'roles': roles,
-        if (tenantId != null) 'tenant_id': tenantId,
-        if (status != null) 'status': status,
-        if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
-        if (updatedAt != null) 'updated_at': updatedAt!.toIso8601String(),
-      };
+    'id': id,
+    'email': email,
+    if (name != null) 'name': name,
+    if (roles != null) 'roles': roles,
+    if (tenantId != null) 'tenant_id': tenantId,
+    if (status != null) 'status': status,
+    if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
+    if (updatedAt != null) 'updated_at': updatedAt!.toIso8601String(),
+  };
 }
 
 /// An API key for programmatic access.
@@ -116,26 +112,26 @@ class ApiKey {
   final DateTime? expiresAt;
 
   factory ApiKey.fromJson(Map<String, dynamic> json) => ApiKey(
-        id: json['id'] as String,
-        name: json['name'] as String,
-        key: json['key'] as String?,
-        scopes: (json['scopes'] as List<dynamic>?)
-            ?.map((e) => e as String)
-            .toList(),
-        createdAt: json['created_at'] != null
-            ? DateTime.parse(json['created_at'] as String)
-            : null,
-        expiresAt: json['expires_at'] != null
-            ? DateTime.parse(json['expires_at'] as String)
-            : null,
-      );
+    id: json['id'] as String,
+    name: json['name'] as String,
+    key: json['key'] as String?,
+    scopes: (json['scopes'] as List<dynamic>?)
+        ?.map((e) => e as String)
+        .toList(),
+    createdAt: json['created_at'] != null
+        ? DateTime.parse(json['created_at'] as String)
+        : null,
+    expiresAt: json['expires_at'] != null
+        ? DateTime.parse(json['expires_at'] as String)
+        : null,
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        if (key != null) 'key': key,
-        if (scopes != null) 'scopes': scopes,
-        if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
-        if (expiresAt != null) 'expires_at': expiresAt!.toIso8601String(),
-      };
+    'id': id,
+    'name': name,
+    if (key != null) 'key': key,
+    if (scopes != null) 'scopes': scopes,
+    if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
+    if (expiresAt != null) 'expires_at': expiresAt!.toIso8601String(),
+  };
 }

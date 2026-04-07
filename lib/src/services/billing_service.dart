@@ -19,16 +19,18 @@ class OlympusBillingService {
 
   /// Get resource usage for the current billing period.
   Future<UsageReport> getUsage({String? period}) async {
-    final json = await _http.get('/billing/stats', queryParameters: {
-      'period': ?period,
-    });
+    final json = await _http.get(
+      '/billing/stats',
+      queryParameters: {'period': ?period},
+    );
     return UsageReport.fromJson(json);
   }
 
   /// List invoices for the tenant.
   Future<List<Invoice>> getInvoices() async {
     final json = await _http.get('/billing/invoices');
-    final items = json['invoices'] as List<dynamic>? ??
+    final items =
+        json['invoices'] as List<dynamic>? ??
         json['data'] as List<dynamic>? ??
         [];
     return items
@@ -50,9 +52,10 @@ class OlympusBillingService {
 
   /// Upgrade (or downgrade) to a different plan.
   Future<Plan> upgradePlan(String planId) async {
-    final json = await _http.put('/billing/subscription/plan', data: {
-      'plan_id': planId,
-    });
+    final json = await _http.put(
+      '/billing/subscription/plan',
+      data: {'plan_id': planId},
+    );
     return Plan.fromJson(json);
   }
 
@@ -61,14 +64,13 @@ class OlympusBillingService {
     final json = await _http.get('/platform/billing/plans');
     final items =
         json['plans'] as List<dynamic>? ?? json['data'] as List<dynamic>? ?? [];
-    return items
-        .map((e) => Plan.fromJson(e as Map<String, dynamic>))
-        .toList();
+    return items.map((e) => Plan.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   /// Add a payment method.
   Future<Map<String, dynamic>> addPaymentMethod(
-      Map<String, dynamic> method) async {
+    Map<String, dynamic> method,
+  ) async {
     return _http.post('/billing/payment-methods', data: method);
   }
 
