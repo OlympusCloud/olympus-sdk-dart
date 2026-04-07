@@ -138,12 +138,15 @@ class CatalogItem {
     required this.id,
     required this.name,
     required this.price,
+    this.priceCents,
     this.description,
     this.category,
     this.categoryId,
     this.imageUrl,
     this.modifiers,
     this.available,
+    this.tags,
+    this.metadata,
     this.createdAt,
     this.updatedAt,
   });
@@ -153,12 +156,23 @@ class CatalogItem {
 
   /// Price in cents.
   final int price;
+
+  /// Alias for [price] — some company apps prefer this name.
+  final int? priceCents;
+
   final String? description;
   final String? category;
   final String? categoryId;
   final String? imageUrl;
   final List<CatalogModifier>? modifiers;
   final bool? available;
+
+  /// Freeform tags for filtering (e.g., 'vegetarian', 'spicy', 'popular').
+  final List<String>? tags;
+
+  /// Arbitrary key-value metadata for app-specific extensions.
+  final Map<String, dynamic>? metadata;
+
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -174,6 +188,9 @@ class CatalogItem {
         ?.map((e) => CatalogModifier.fromJson(e as Map<String, dynamic>))
         .toList(),
     available: json['available'] as bool?,
+    tags: (json['tags'] as List<dynamic>?)?.cast<String>(),
+    metadata: json['metadata'] as Map<String, dynamic>?,
+    priceCents: json['price_cents'] as int? ?? json['price'] as int?,
     createdAt: json['created_at'] != null
         ? DateTime.parse(json['created_at'] as String)
         : null,
@@ -186,6 +203,7 @@ class CatalogItem {
     'id': id,
     'name': name,
     'price': price,
+    if (priceCents != null) 'price_cents': priceCents,
     if (description != null) 'description': description,
     if (category != null) 'category': category,
     if (categoryId != null) 'category_id': categoryId,
@@ -193,6 +211,8 @@ class CatalogItem {
     if (modifiers != null)
       'modifiers': modifiers!.map((e) => e.toJson()).toList(),
     if (available != null) 'available': available,
+    if (tags != null) 'tags': tags,
+    if (metadata != null) 'metadata': metadata,
     if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
     if (updatedAt != null) 'updated_at': updatedAt!.toIso8601String(),
   };
