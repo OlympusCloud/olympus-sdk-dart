@@ -24,6 +24,12 @@ library;
 
 export 'src/client.dart';
 export 'src/config.dart';
+export 'src/http_client.dart'
+    show
+        OlympusApiError,
+        OlympusAuthExpiredError,
+        TokenStore,
+        InMemoryTokenStore;
 export 'src/models/models.dart';
 export 'src/services/ai_service.dart';
 export 'src/services/auth_service.dart';

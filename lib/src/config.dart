@@ -27,25 +27,32 @@ class OlympusConfig {
   factory OlympusConfig.sandbox({
     required String appId,
     required String apiKey,
-  }) =>
-      OlympusConfig(
-        appId: appId,
-        apiKey: apiKey,
-        baseUrl: 'https://sandbox.api.olympuscloud.ai/api/v1',
-        environment: OlympusEnvironment.sandbox,
-      );
+  }) => OlympusConfig(
+    appId: appId,
+    apiKey: apiKey,
+    baseUrl: 'https://sandbox.api.olympuscloud.ai/api/v1',
+    environment: OlympusEnvironment.sandbox,
+  );
 
   /// Create a dev config.
-  factory OlympusConfig.dev({
-    required String appId,
-    required String apiKey,
-  }) =>
+  factory OlympusConfig.dev({required String appId, required String apiKey}) =>
       OlympusConfig(
         appId: appId,
         apiKey: apiKey,
         baseUrl: 'https://dev.api.olympuscloud.ai/api/v1',
         environment: OlympusEnvironment.development,
       );
+
+  /// Create a staging config.
+  factory OlympusConfig.staging({
+    required String appId,
+    required String apiKey,
+  }) => OlympusConfig(
+    appId: appId,
+    apiKey: apiKey,
+    baseUrl: 'https://staging.api.olympuscloud.ai/api/v1',
+    environment: OlympusEnvironment.staging,
+  );
 }
 
 enum OlympusEnvironment { production, staging, development, sandbox }

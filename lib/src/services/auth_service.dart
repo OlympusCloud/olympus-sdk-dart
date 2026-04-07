@@ -15,12 +15,15 @@ class OlympusAuthService {
   /// On success the returned [AuthSession.accessToken] is automatically
   /// set on the HTTP client for subsequent requests.
   Future<AuthSession> login(String email, String password) async {
-    final json = await _http.post('/auth/login', data: {
-      'email': email,
-      'password': password,
-    });
+    final json = await _http.post(
+      '/auth/login',
+      data: {'email': email, 'password': password},
+    );
     final session = AuthSession.fromJson(json);
     _http.setAccessToken(session.accessToken);
+    if (session.refreshToken != null) {
+      _http.setRefreshToken(session.refreshToken!);
+    }
     return session;
   }
 
@@ -28,22 +31,29 @@ class OlympusAuthService {
   ///
   /// Returns the session after the SSO callback completes.
   Future<AuthSession> loginSSO(String provider) async {
-    final json = await _http.post('/auth/sso/initiate', data: {
-      'provider': provider,
-    });
+    final json = await _http.post(
+      '/auth/sso/initiate',
+      data: {'provider': provider},
+    );
     final session = AuthSession.fromJson(json);
     _http.setAccessToken(session.accessToken);
+    if (session.refreshToken != null) {
+      _http.setRefreshToken(session.refreshToken!);
+    }
     return session;
   }
 
   /// Authenticate staff using a PIN code.
   Future<AuthSession> loginPin(String pin, {String? locationId}) async {
-    final json = await _http.post('/auth/login/pin', data: {
-      'pin': pin,
-      'location_id': ?locationId,
-    });
+    final json = await _http.post(
+      '/auth/login/pin',
+      data: {'pin': pin, 'location_id': ?locationId},
+    );
     final session = AuthSession.fromJson(json);
     _http.setAccessToken(session.accessToken);
+    if (session.refreshToken != null) {
+      _http.setRefreshToken(session.refreshToken!);
+    }
     return session;
   }
 
@@ -53,23 +63,17 @@ class OlympusAuthService {
     return User.fromJson(json);
   }
 
-  /// Get the current auth session, or null if not logged in.
-  Future<AuthSession?> currentSession() async {
-    try {
-      final json = await _http.get('/auth/session');
-      return AuthSession.fromJson(json);
-    } catch (_) {
-      return null;
-    }
-  }
-
   /// Refresh the access token using a refresh token.
   Future<AuthSession> refresh(String refreshToken) async {
-    final json = await _http.post('/auth/refresh', data: {
-      'refresh_token': refreshToken,
-    });
+    final json = await _http.post(
+      '/auth/refresh',
+      data: {'refresh_token': refreshToken},
+    );
     final session = AuthSession.fromJson(json);
     _http.setAccessToken(session.accessToken);
+    if (session.refreshToken != null) {
+      _http.setRefreshToken(session.refreshToken!);
+    }
     return session;
   }
 
@@ -86,20 +90,16 @@ class OlympusAuthService {
     required String role,
     String? password,
   }) async {
-    final json = await _http.post('/platform/users', data: {
-      'name': name,
-      'email': email,
-      'role': role,
-      'password': ?password,
-    });
+    final json = await _http.post(
+      '/platform/users',
+      data: {'name': name, 'email': email, 'role': role, 'password': ?password},
+    );
     return User.fromJson(json);
   }
 
   /// Assign a role to a user.
   Future<void> assignRole(String userId, String role) async {
-    await _http.post('/platform/users/$userId/roles', data: {
-      'role': role,
-    });
+    await _http.post('/platform/users/$userId/roles', data: {'role': role});
   }
 
   /// Check whether a user has a specific permission.
@@ -113,10 +113,10 @@ class OlympusAuthService {
 
   /// Create a new API key for programmatic access.
   Future<ApiKey> createApiKey(String name, List<String> scopes) async {
-    final json = await _http.post('/platform/tenants/me/api-keys', data: {
-      'name': name,
-      'scopes': scopes,
-    });
+    final json = await _http.post(
+      '/platform/tenants/me/api-keys',
+      data: {'name': name, 'scopes': scopes},
+    );
     return ApiKey.fromJson(json);
   }
 
