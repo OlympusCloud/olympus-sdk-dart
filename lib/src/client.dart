@@ -4,15 +4,22 @@ import 'services/ai_service.dart';
 import 'services/auth_service.dart';
 import 'services/billing_service.dart';
 import 'services/commerce_service.dart';
+import 'services/connect_service.dart';
 import 'services/data_service.dart';
 import 'services/devices_service.dart';
 import 'services/events_service.dart';
 import 'services/gating_service.dart';
+import 'services/health_service.dart';
 import 'services/marketplace_service.dart';
 import 'services/notify_service.dart';
 import 'services/observe_service.dart';
 import 'services/pay_service.dart';
+import 'services/skills_service.dart';
+import 'services/smart_home_service.dart';
 import 'services/storage_service.dart';
+import 'services/training_service.dart';
+import 'services/voice_service.dart';
+import 'services/workflow_service.dart';
 
 /// Main entry point for the Olympus Cloud SDK.
 ///
@@ -72,6 +79,13 @@ class OlympusClient {
   OlympusGatingService? _gating;
   OlympusDevicesService? _devices;
   OlympusObserveService? _observe;
+  OlympusVoiceService? _voice;
+  OlympusWorkflowService? _workflows;
+  OlympusHealthService? _health;
+  OlympusSmartHomeService? _smartHome;
+  OlympusSkillsService? _skills;
+  OlympusTrainingService? _training;
+  OlympusConnectService? _connect;
 
   /// Authentication, user management, and API keys.
   OlympusAuthService get auth => _auth ??= OlympusAuthService(_http);
@@ -117,6 +131,31 @@ class OlympusClient {
   /// Client-side observability: events, errors, traces.
   OlympusObserveService get observe =>
       _observe ??= OlympusObserveService(_http);
+
+  /// Voice AI: agents, conversations, campaigns, phone numbers, and profiles.
+  OlympusVoiceService get voice => _voice ??= OlympusVoiceService(_http);
+
+  /// Workflow automation: create, manage, and execute workflows.
+  OlympusWorkflowService get workflows =>
+      _workflows ??= OlympusWorkflowService(_http);
+
+  /// Health integrations: providers, sync, and insights.
+  OlympusHealthService get health => _health ??= OlympusHealthService(_http);
+
+  /// Smart home: platforms, devices, rooms, and control.
+  OlympusSmartHomeService get smartHome =>
+      _smartHome ??= OlympusSmartHomeService(_http);
+
+  /// AI skills: browse, install, and manage voice AI skills.
+  OlympusSkillsService get skills => _skills ??= OlympusSkillsService(_http);
+
+  /// Training: FAQ, upsell rules, instructions, and knowledge base sync.
+  OlympusTrainingService get training =>
+      _training ??= OlympusTrainingService(_http);
+
+  /// External connections: Google OAuth, Calendar, and Gmail.
+  OlympusConnectService get connect =>
+      _connect ??= OlympusConnectService(_http);
 
   // ---------------------------------------------------------------------------
   // Configuration accessors
