@@ -68,4 +68,69 @@ class OlympusMarketplaceService {
       data: {'rating': rating, 'text': text},
     );
   }
+
+  /// Multi-tenant marketplace checkout — issue #2819.
+  ///
+  /// Lets a single agent (typically a marketplace concierge or aggregator)
+  /// place orders against multiple tenants in one call. The Go gateway
+  /// fans out to the per-tenant Commerce service, returns the resulting
+  /// orders, and lists any tenants whose order failed.
+  ///
+  /// Returns the raw envelope:
+  ///
+  /// ```dart
+  /// {
+  ///   "agent_id": "agent_123",
+  ///   "orders":   [ ... ],     // successful CreateOrder responses
+  ///   "failed":   [ "tenant_x" ], // tenant ids where the order failed
+  ///   "status":   "completed" | "partially_completed" | "failed"
+  /// }
+  /// ```
+  Future<Map<String, dynamic>> multiTenantCheckout({
+    required String agentId,
+    required String userId,
+    required List<MultiTenantOrderPayload> orders,
+    Map<String, dynamic>? metadata,
+  }) async {
+    return await _http.post(
+      '/marketplace/checkout',
+      data: {
+        'agent_id': agentId,
+        'user_id': userId,
+        'orders': orders.map((o) => o.toJson()).toList(),
+        'metadata': ?metadata,
+      },
+    );
+  }
+}
+
+/// One tenant's slice of a multi-tenant marketplace checkout.
+class MultiTenantOrderPayload {
+  const MultiTenantOrderPayload({
+    required this.tenantId,
+    required this.restaurantId,
+    required this.items,
+    this.orderType,
+  });
+
+  /// Tenant the order is placed against.
+  final String tenantId;
+
+  /// Restaurant / location within the tenant.
+  final String restaurantId;
+
+  /// Order line items in the same shape Commerce's CreateOrderItemRequest
+  /// uses (catalog id, quantity, modifiers, notes, etc.).
+  final List<Map<String, dynamic>> items;
+
+  /// Order type — `dine_in`, `takeout`, `delivery`, etc. Optional;
+  /// defaults to whatever the Commerce service defaults to.
+  final String? orderType;
+
+  Map<String, dynamic> toJson() => {
+    'tenant_id': tenantId,
+    'restaurant_id': restaurantId,
+    'items': items,
+    'order_type': ?orderType,
+  };
 }

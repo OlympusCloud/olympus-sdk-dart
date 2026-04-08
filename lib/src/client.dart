@@ -1,6 +1,7 @@
 import 'config.dart';
 import 'http_client.dart';
 import 'services/ads_service.dart';
+import 'services/agent_service.dart';
 import 'services/ai_service.dart';
 import 'services/auth_service.dart';
 import 'services/billing_service.dart';
@@ -98,6 +99,7 @@ class OlympusClient {
   OlympusVisionService? _vision;
   OlympusWearableService? _wearable;
   OlympusGenerativeUiService? _genui;
+  OlympusAgentService? _agent;
 
   /// Authentication, user management, and API keys.
   OlympusAuthService get auth => _auth ??= OlympusAuthService(_http);
@@ -193,6 +195,10 @@ class OlympusClient {
   /// `genui.events` and use `genui.getPatch(widgetId)` when rendering.
   OlympusGenerativeUiService get genui =>
       _genui ??= OlympusGenerativeUiService();
+
+  /// LangGraph agent service: chat with optional approval gating, content
+  /// suggestions, upsell ideas, and OTA self-healing UI patch dispatch.
+  OlympusAgentService get agent => _agent ??= OlympusAgentService(_http);
 
   // ---------------------------------------------------------------------------
   // Configuration accessors
