@@ -1,5 +1,6 @@
 import 'config.dart';
 import 'http_client.dart';
+import 'services/ads_service.dart';
 import 'services/ai_service.dart';
 import 'services/auth_service.dart';
 import 'services/billing_service.dart';
@@ -9,7 +10,10 @@ import 'services/data_service.dart';
 import 'services/devices_service.dart';
 import 'services/events_service.dart';
 import 'services/gating_service.dart';
+import 'services/genui_service.dart';
 import 'services/health_service.dart';
+import 'services/identity_service.dart';
+import 'services/live_activity_service.dart';
 import 'services/marketplace_service.dart';
 import 'services/notify_service.dart';
 import 'services/observe_service.dart';
@@ -18,7 +22,9 @@ import 'services/skills_service.dart';
 import 'services/smart_home_service.dart';
 import 'services/storage_service.dart';
 import 'services/training_service.dart';
+import 'services/vision_service.dart';
 import 'services/voice_service.dart';
+import 'services/wearable_service.dart';
 import 'services/workflow_service.dart';
 
 /// Main entry point for the Olympus Cloud SDK.
@@ -69,6 +75,7 @@ class OlympusClient {
   OlympusAuthService? _auth;
   OlympusCommerceService? _commerce;
   OlympusAiService? _ai;
+  OlympusAdsService? _ads;
   OlympusPayService? _pay;
   OlympusNotifyService? _notify;
   OlympusEventsService? _events;
@@ -82,10 +89,15 @@ class OlympusClient {
   OlympusVoiceService? _voice;
   OlympusWorkflowService? _workflows;
   OlympusHealthService? _health;
+  OlympusIdentityService? _identity;
+  LiveActivityService? _liveActivity;
   OlympusSmartHomeService? _smartHome;
   OlympusSkillsService? _skills;
   OlympusTrainingService? _training;
   OlympusConnectService? _connect;
+  OlympusVisionService? _vision;
+  OlympusWearableService? _wearable;
+  OlympusGenerativeUiService? _genui;
 
   /// Authentication, user management, and API keys.
   OlympusAuthService get auth => _auth ??= OlympusAuthService(_http);
@@ -96,6 +108,9 @@ class OlympusClient {
 
   /// AI inference, agents, embeddings, and NLP.
   OlympusAiService get ai => _ai ??= OlympusAiService(_http);
+
+  /// Ad mediation: placements, impressions, revenue reporting.
+  OlympusAdsService get ads => _ads ??= OlympusAdsService(_http);
 
   /// Payments, refunds, balance, and payouts.
   OlympusPayService get pay => _pay ??= OlympusPayService(_http);
@@ -142,6 +157,14 @@ class OlympusClient {
   /// Health integrations: providers, sync, and insights.
   OlympusHealthService get health => _health ??= OlympusHealthService(_http);
 
+  /// Olympus ID — global, cross-tenant identity & federation.
+  OlympusIdentityService get identity =>
+      _identity ??= OlympusIdentityService(_http);
+
+  /// iOS Live Activities and Dynamic Island management.
+  LiveActivityService get liveActivity =>
+      _liveActivity ??= LiveActivityService();
+
   /// Smart home: platforms, devices, rooms, and control.
   OlympusSmartHomeService get smartHome =>
       _smartHome ??= OlympusSmartHomeService(_http);
@@ -156,6 +179,20 @@ class OlympusClient {
   /// External connections: Google OAuth, Calendar, and Gmail.
   OlympusConnectService get connect =>
       _connect ??= OlympusConnectService(_http);
+
+  /// Vision AI: product recognition, food recognition, 3D model
+  /// generation, ghost-inventory detection, and camera surveillance.
+  OlympusVisionService get vision => _vision ??= OlympusVisionService(_http);
+
+  /// Wearable companion bridge — WearOS and watchOS (alerts, glanceables,
+  /// voice commands).
+  OlympusWearableService get wearable =>
+      _wearable ??= OlympusWearableService();
+
+  /// Self-Healing UI / Generative UI patch transport. Apps subscribe to
+  /// `genui.events` and use `genui.getPatch(widgetId)` when rendering.
+  OlympusGenerativeUiService get genui =>
+      _genui ??= OlympusGenerativeUiService();
 
   // ---------------------------------------------------------------------------
   // Configuration accessors

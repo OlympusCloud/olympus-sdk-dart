@@ -31,6 +31,7 @@ export 'src/http_client.dart'
         TokenStore,
         InMemoryTokenStore;
 export 'src/models/models.dart';
+export 'src/services/ads_service.dart';
 export 'src/services/ai_service.dart';
 export 'src/services/auth_service.dart';
 export 'src/services/billing_service.dart';
@@ -40,7 +41,10 @@ export 'src/services/data_service.dart';
 export 'src/services/devices_service.dart';
 export 'src/services/events_service.dart';
 export 'src/services/gating_service.dart';
+export 'src/services/genui_service.dart';
 export 'src/services/health_service.dart';
+export 'src/services/identity_service.dart';
+export 'src/services/live_activity_service.dart';
 export 'src/services/marketplace_service.dart';
 export 'src/services/notify_service.dart';
 export 'src/services/observe_service.dart';
@@ -49,5 +53,7 @@ export 'src/services/skills_service.dart';
 export 'src/services/smart_home_service.dart';
 export 'src/services/storage_service.dart';
 export 'src/services/training_service.dart';
+export 'src/services/vision_service.dart';
 export 'src/services/voice_service.dart';
+export 'src/services/wearable_service.dart';
 export 'src/services/workflow_service.dart';

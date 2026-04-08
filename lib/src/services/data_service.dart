@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import '../http_client.dart';
 import '../models/common.dart';
 
@@ -14,15 +12,7 @@ class OlympusDataService {
 
   /// Execute a read-only SQL query against the platform data layer.
   ///
-  /// Returns rows as a list of column-name-keyed maps. Defensively
-  /// normalizes the backend's row shape: PGAdapter, Spanner, ClickHouse,
-  /// and edge workers all serialize "row" slightly differently — some
-  /// return `Map<String, dynamic>`, some return `Map<dynamic, dynamic>`,
-  /// and some send each row as a JSON-encoded `String`. A naive
-  /// `rows.cast<Map<String, dynamic>>()` is lazy and explodes at first
-  /// access with `type 'String' is not a subtype of type
-  /// 'Map<String, dynamic>?'`. We materialize + normalize here so callers
-  /// can safely call `.first` and similar without crashing the screen.
+  /// Returns rows as a list of column-name-keyed maps.
   Future<List<Map<String, dynamic>>> query(
     String sql, {
     Map<String, dynamic>? params,
@@ -31,31 +21,9 @@ class OlympusDataService {
       '/data/query',
       data: {'sql': sql, 'params': ?params},
     );
-    final rawRows =
+    final rows =
         json['rows'] as List<dynamic>? ?? json['data'] as List<dynamic>? ?? [];
-    return rawRows.map(_normalizeRow).toList();
-  }
-
-  /// Coerce an arbitrary row value into a `Map<String, dynamic>`.
-  /// Never throws — falls back to an empty map on unrecognized shapes.
-  static Map<String, dynamic> _normalizeRow(dynamic row) {
-    if (row == null) return <String, dynamic>{};
-    if (row is Map<String, dynamic>) return row;
-    if (row is Map) {
-      return row.map((k, v) => MapEntry(k.toString(), v));
-    }
-    if (row is String && row.isNotEmpty) {
-      try {
-        final decoded = jsonDecode(row);
-        if (decoded is Map<String, dynamic>) return decoded;
-        if (decoded is Map) {
-          return decoded.map((k, v) => MapEntry(k.toString(), v));
-        }
-      } catch (_) {
-        // Fall through — return empty map rather than crash the caller.
-      }
-    }
-    return <String, dynamic>{};
+    return rows.cast<Map<String, dynamic>>();
   }
 
   /// Insert a record into a table.

@@ -42,6 +42,26 @@ class OlympusPayService {
     return Payment.fromJson(json);
   }
 
+  /// Charge an order using a global Olympus ID token (Architecture 4.0).
+  ///
+  /// This leverages the unified wallet to share Stripe payment tokens
+  /// securely across the ecosystem (Issue #2817).
+  Future<Payment> chargeWithOlympusId({
+    required String orderId,
+    required int amount,
+    required String olympusIdToken,
+  }) async {
+    final json = await _http.post(
+      '/payments/intents/olympus',
+      data: {
+        'order_id': orderId,
+        'amount': amount,
+        'olympus_id_token': olympusIdToken,
+      },
+    );
+    return Payment.fromJson(json);
+  }
+
   /// Capture a previously authorized payment.
   Future<Payment> capture(String paymentId) async {
     final json = await _http.post('/payments/$paymentId/capture');

@@ -60,4 +60,43 @@ class OlympusWorkflowService {
         [];
     return items.cast<Map<String, dynamic>>();
   }
+
+  /// Execute (run) a workflow by ID.
+  ///
+  /// Returns the execution record. When [async] is true the API responds
+  /// with a pending execution that the caller can poll via [getExecution].
+  Future<Map<String, dynamic>> execute(
+    String workflowId, {
+    Map<String, dynamic>? input,
+    bool async = false,
+  }) async {
+    return _http.post(
+      '/workflows/$workflowId/execute',
+      data: {'input': ?input, 'async': async},
+    );
+  }
+
+  /// Create a top-level execution runtime record (SDK-friendly variant).
+  ///
+  /// Mirrors `POST /v1/workflows/executions` — equivalent to `execute` but
+  /// using the top-level runtime endpoint rather than the nested one.
+  Future<Map<String, dynamic>> createExecution({
+    required String workflowId,
+    Map<String, dynamic>? input,
+    bool async = false,
+  }) async {
+    return _http.post(
+      '/workflows/executions',
+      data: {
+        'workflow_id': workflowId,
+        'input': ?input,
+        'async': async,
+      },
+    );
+  }
+
+  /// Get a single execution by ID.
+  Future<Map<String, dynamic>> getExecution(String executionId) async {
+    return _http.get('/workflows/executions/$executionId');
+  }
 }

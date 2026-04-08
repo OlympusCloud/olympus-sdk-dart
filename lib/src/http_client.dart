@@ -142,6 +142,52 @@ class OlympusHttpClient {
     await _dio.delete<void>(path);
   }
 
+  /// GET request that returns a JSON array (instead of an object).
+  ///
+  /// Most endpoints return a JSON object, but a handful (e.g.
+  /// `GET /vision/cameras`, `GET /vision/surveillance/events`) return a
+  /// top-level array. Use this helper for those cases.
+  Future<List<dynamic>> getList(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    final response = await _dio.get<List<dynamic>>(
+      path,
+      queryParameters: queryParameters,
+    );
+    return response.data ?? const [];
+  }
+
+  /// Upload raw image/file bytes as a `multipart/form-data` POST.
+  ///
+  /// The bytes are sent as the `file` field — matching FastAPI's
+  /// `UploadFile = File(...)` parameter convention used by Vision and
+  /// other ingestion endpoints. Returns the decoded JSON response.
+  Future<Map<String, dynamic>> uploadBytes(
+    String path, {
+    required List<int> bytes,
+    required String filename,
+    String contentType = 'application/octet-stream',
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? extraFields,
+  }) async {
+    final formData = FormData.fromMap({
+      ...?extraFields,
+      'file': MultipartFile.fromBytes(
+        bytes,
+        filename: filename,
+        contentType: DioMediaType.parse(contentType),
+      ),
+    });
+    final response = await _dio.post<Map<String, dynamic>>(
+      path,
+      data: formData,
+      queryParameters: queryParameters,
+      options: Options(contentType: 'multipart/form-data'),
+    );
+    return response.data ?? {};
+  }
+
   /// Raw Dio access for streaming responses.
   Dio get dio => _dio;
 }

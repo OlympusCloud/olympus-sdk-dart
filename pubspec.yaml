@@ -1,20 +1,32 @@
 name: olympus_sdk
 description: >
   Official Dart SDK for Olympus Cloud — the AI Business Operating System.
-  Typed API client for all 18+ platform services: Auth, Commerce, AI, Pay,
-  Notify, Events, Data, Storage, Marketplace, Billing, Gating, Devices, and more.
-version: 0.1.0
+  Typed API client for 25+ platform services: Auth, Commerce, AI, Pay,
+  Notify, Events, Data, Storage, Marketplace, Billing, Gating, Devices,
+  Identity (cross-tenant SSO), Vision (AR/3D/recognition), Wearable
+  (WearOS/watchOS), Generative UI (self-healing OTA), Live Activities,
+  and more.
+version: 0.2.0
 publish_to: "none"
 
 environment:
   sdk: '>=3.11.0 <4.0.0'
+  flutter: ">=3.24.0"
 
 dependencies:
+  # Flutter is required because the SDK ships native bridges
+  # (live_activity_service + wearable_service use MethodChannel for iOS
+  # Live Activities, WearOS, watchOS). External apps that consume
+  # olympus_sdk are themselves Flutter apps.
+  flutter:
+    sdk: flutter
   dio: ^5.8.0+1
   json_annotation: ^4.9.0
   meta: ^1.16.0
 
 dev_dependencies:
   build_runner: ^2.4.15
+  flutter_test:
+    sdk: flutter
   json_serializable: ^6.9.4
   test: ^1.25.15

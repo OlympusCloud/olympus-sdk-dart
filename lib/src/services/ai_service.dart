@@ -251,4 +251,169 @@ class OlympusAiService {
     }
     return [];
   }
+
+  // ---------------------------------------------------------------------------
+  // RAG (Vectorize) — Issue #2724
+  // ---------------------------------------------------------------------------
+
+  /// Semantic search over a tenant's Vectorize knowledge base.
+  ///
+  /// [namespace] must be one of: `menu`, `knowledge`, `products`, `operations`,
+  /// `sales`. Defaults to `knowledge`. [topK] bounds the number of matches
+  /// returned (1-100). [minScore] filters matches below the given similarity.
+  Future<Map<String, dynamic>> ragQuery(
+    String query, {
+    String? namespace,
+    int? topK,
+    double? minScore,
+    Map<String, String>? filters,
+  }) async {
+    return _http.post(
+      '/rag/query',
+      data: {
+        'query': query,
+        'namespace': ?namespace,
+        'top_k': ?topK,
+        'min_score': ?minScore,
+        'filters': ?filters,
+      },
+    );
+  }
+
+  /// Generate a vector embedding for [text] using the platform embedding model.
+  ///
+  /// Returns the raw response including `embedding`, `dimensions`, and `model`.
+  Future<Map<String, dynamic>> ragEmbed(
+    String text, {
+    String? model,
+  }) async {
+    return _http.post(
+      '/rag/embed',
+      data: {'text': text, 'model': ?model},
+    );
+  }
+
+  /// Index (upsert) a document into the tenant's Vectorize knowledge base.
+  ///
+  /// Returns the indexing result (id, namespace, status).
+  Future<Map<String, dynamic>> ragIndex({
+    required String namespace,
+    required String id,
+    required String text,
+    Map<String, dynamic>? metadata,
+  }) async {
+    return _http.post(
+      '/rag/index',
+      data: {
+        'namespace': namespace,
+        'id': id,
+        'text': text,
+        'metadata': ?metadata,
+      },
+    );
+  }
+
+  /// List available RAG indexes for the authenticated tenant.
+  Future<List<Map<String, dynamic>>> ragListIndexes({String? status}) async {
+    final json = await _http.get(
+      '/rag/indexes',
+      queryParameters: {'status': ?status},
+    );
+    final items = json['indexes'] as List<dynamic>? ?? [];
+    return items.cast<Map<String, dynamic>>();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Gemini Live — Issue #2728
+  // ---------------------------------------------------------------------------
+
+  /// Gemini Live accessor — real-time multimodal AI conversations.
+  OlympusGeminiLive get geminiLive => OlympusGeminiLive(_http);
+}
+
+/// Gemini Live session management.
+///
+/// Real-time multimodal AI conversations via Vertex AI Gemini Live API.
+/// Routes: `/gemini-live/*` (mounted at `/v1/gemini-live` by the Go gateway).
+class OlympusGeminiLive {
+  OlympusGeminiLive(this._http);
+
+  final OlympusHttpClient _http;
+
+  /// Create (start) a new Gemini Live session.
+  ///
+  /// Returns a session record that includes `session_id`, `websocket_url`,
+  /// `status`, and any configuration echoed back by the server. Callers use
+  /// the `websocket_url` to open the streaming connection.
+  Future<Map<String, dynamic>> startSession({
+    String? model,
+    String? voice,
+    String? language,
+    List<String>? tools,
+    Map<String, dynamic>? context,
+  }) async {
+    return _http.post(
+      '/gemini-live/session',
+      data: {
+        'model': ?model,
+        'voice': ?voice,
+        'language': ?language,
+        'tools': ?tools,
+        'context': ?context,
+      },
+    );
+  }
+
+  /// Get the current status and metadata of a Gemini Live session.
+  Future<Map<String, dynamic>> getSession(String sessionId) async {
+    return _http.get('/gemini-live/session/$sessionId');
+  }
+
+  /// End an active Gemini Live session and release its resources.
+  Future<void> endSession(String sessionId) async {
+    await _http.delete('/gemini-live/session/$sessionId');
+  }
+
+  /// Update the configuration of an active Gemini Live session.
+  ///
+  /// Use this to change voice, language, or enabled tools mid-session.
+  Future<Map<String, dynamic>> configureSession(
+    String sessionId, {
+    String? voice,
+    String? language,
+    List<String>? tools,
+  }) async {
+    return _http.post(
+      '/gemini-live/session/$sessionId/config',
+      data: {
+        'voice': ?voice,
+        'language': ?language,
+        'tools': ?tools,
+      },
+    );
+  }
+
+  /// Convenience wrapper: [startSession] that also returns the WebSocket URL.
+  ///
+  /// Returns a tuple-like map with keys `session_id` and `websocket_url` that
+  /// callers can pass directly to a streaming client.
+  Future<Map<String, String>> stream({
+    String? model,
+    String? voice,
+    String? language,
+    List<String>? tools,
+    Map<String, dynamic>? context,
+  }) async {
+    final json = await startSession(
+      model: model,
+      voice: voice,
+      language: language,
+      tools: tools,
+      context: context,
+    );
+    return {
+      'session_id': (json['session_id'] as String?) ?? '',
+      'websocket_url': (json['websocket_url'] as String?) ?? '',
+    };
+  }
 }
