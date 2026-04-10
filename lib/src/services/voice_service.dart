@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import '../http_client.dart';
 
 /// Voice AI platform: agent configs, conversations, campaigns, phone numbers,
-/// marketplace voices, calls, speaker profiles, and analytics.
+/// marketplace voices, calls, speaker profiles, analytics, and edge voice
+/// pipeline (STT→Ether→TTS via CF Containers).
 ///
 /// Routes: `/voice-agents/*`, `/voice/phone-numbers/*`, `/voice/marketplace/*`,
-/// `/voice/calls/*`, `/voice/speaker/*`, `/voice/profiles/*`.
+/// `/voice/calls/*`, `/voice/speaker/*`, `/voice/profiles/*`,
+/// `/voice/process` (edge pipeline REST), `/ws/voice` (edge pipeline WebSocket).
 class OlympusVoiceService {
   OlympusVoiceService(this._http);
 
@@ -368,5 +372,60 @@ class OlympusVoiceService {
     Map<String, dynamic> profile,
   ) async {
     return _http.put('/voice/profiles/$profileId', data: profile);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Edge Voice Pipeline (CF Container — STT→Ether→TTS)
+  // ---------------------------------------------------------------------------
+
+  /// Process recorded audio through the full edge voice pipeline.
+  ///
+  /// Sends audio to the CF Container voice pipeline which runs:
+  /// STT (Workers AI Whisper, FREE) → Ether classification → AI response → TTS.
+  ///
+  /// Returns `{transcript, response, audio_url, pipeline_ms}`.
+  Future<Map<String, dynamic>> processAudio(
+    List<int> audioBytes, {
+    String? language,
+    String? agentId,
+    String? voiceId,
+    String? sessionId,
+  }) async {
+    return _http.post(
+      '/voice/process',
+      data: {
+        'audio': base64Encode(audioBytes),
+        if (language != null) 'language': language,
+        if (agentId != null) 'agent_id': agentId,
+        if (voiceId != null) 'voice_id': voiceId,
+        if (sessionId != null) 'session_id': sessionId,
+      },
+    );
+  }
+
+  /// Get the WebSocket URL for streaming voice interaction.
+  ///
+  /// The WebSocket endpoint at `/ws/voice` accepts:
+  /// - `{type: "audio", data: "<base64>"}` — audio chunks
+  /// - `{type: "barge_in"}` — interrupt current response
+  /// - `{type: "ping"}` — keepalive
+  ///
+  /// And responds with:
+  /// - `{type: "transcript", text: "..."}` — interim STT results
+  /// - `{type: "response", text: "...", audio_url: "..."}` — AI response
+  /// - `{type: "pong"}` — keepalive response
+  ///
+  /// Returns the full WebSocket URL based on the configured API base.
+  String getVoiceWebSocketUrl({String? sessionId}) {
+    final base = _http.config.baseUrl.replaceFirst('https://', 'wss://');
+    final path = sessionId != null
+        ? '/ws/voice?session_id=$sessionId'
+        : '/ws/voice';
+    return '$base$path';
+  }
+
+  /// Check edge voice pipeline health.
+  Future<Map<String, dynamic>> pipelineHealth() async {
+    return _http.get('/voice/pipeline/health');
   }
 }

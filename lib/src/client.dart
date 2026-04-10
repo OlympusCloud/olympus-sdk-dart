@@ -8,6 +8,7 @@ import 'services/billing_service.dart';
 import 'services/commerce_service.dart';
 import 'services/connect_service.dart';
 import 'services/data_service.dart';
+import 'services/ether_service.dart';
 import 'services/devices_service.dart';
 import 'services/events_service.dart';
 import 'services/gating_service.dart';
@@ -26,6 +27,7 @@ import 'services/training_service.dart';
 import 'services/vision_service.dart';
 import 'services/voice_service.dart';
 import 'services/wearable_service.dart';
+import 'services/webhook_service.dart';
 import 'services/workflow_service.dart';
 
 /// Main entry point for the Olympus Cloud SDK.
@@ -86,6 +88,7 @@ class OlympusClient {
   OlympusBillingService? _billing;
   OlympusGatingService? _gating;
   OlympusDevicesService? _devices;
+  OlympusEtherService? _ether;
   OlympusObserveService? _observe;
   OlympusVoiceService? _voice;
   OlympusWorkflowService? _workflows;
@@ -98,6 +101,7 @@ class OlympusClient {
   OlympusConnectService? _connect;
   OlympusVisionService? _vision;
   OlympusWearableService? _wearable;
+  OlympusWebhookService? _webhooks;
   OlympusGenerativeUiService? _genui;
   OlympusAgentService? _agent;
 
@@ -145,12 +149,20 @@ class OlympusClient {
   OlympusDevicesService get devices =>
       _devices ??= OlympusDevicesService(_http);
 
+  /// The Ether (ACP) — edge AI classification, fast inference, embeddings,
+  /// sentiment, language detection, TTS cache, and OCR.
+  OlympusEtherService get ether => _ether ??= OlympusEtherService(_http);
+
   /// Client-side observability: events, errors, traces.
   OlympusObserveService get observe =>
       _observe ??= OlympusObserveService(_http);
 
   /// Voice AI: agents, conversations, campaigns, phone numbers, and profiles.
   OlympusVoiceService get voice => _voice ??= OlympusVoiceService(_http);
+
+  /// Webhook management: register endpoints, delivery status, and testing.
+  OlympusWebhookService get webhooks =>
+      _webhooks ??= OlympusWebhookService(_http);
 
   /// Workflow automation: create, manage, and execute workflows.
   OlympusWorkflowService get workflows =>
