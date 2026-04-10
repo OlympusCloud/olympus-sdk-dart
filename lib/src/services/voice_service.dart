@@ -428,4 +428,79 @@ class OlympusVoiceService {
   Future<Map<String, dynamic>> pipelineHealth() async {
     return _http.get('/voice/pipeline/health');
   }
+
+  // ---------------------------------------------------------------------------
+  // Caller Profiles (v0.3.0 — Issue #2868)
+  // ---------------------------------------------------------------------------
+
+  /// Look up a caller profile by phone number for personalized voice AI.
+  ///
+  /// Returns preferences, order history, loyalty tier, and past interactions.
+  Future<Map<String, dynamic>> getCallerProfile(String phoneNumber) async {
+    return _http.get('/caller-profiles/$phoneNumber');
+  }
+
+  /// List all caller profiles for the current tenant (paginated).
+  Future<Map<String, dynamic>> listCallerProfiles({
+    int limit = 50,
+    int offset = 0,
+  }) async {
+    return _http.get(
+      '/caller-profiles',
+      queryParameters: {'limit': limit, 'offset': offset},
+    );
+  }
+
+  /// Create or update a caller profile.
+  Future<Map<String, dynamic>> upsertCallerProfile(
+    Map<String, dynamic> profile,
+  ) async {
+    return _http.post('/caller-profiles', data: profile);
+  }
+
+  /// Delete a caller profile.
+  Future<void> deleteCallerProfile(String profileId) async {
+    await _http.delete('/caller-profiles/$profileId');
+  }
+
+  /// Record an order for a caller (updates stats + loyalty points).
+  Future<Map<String, dynamic>> recordCallerOrder(
+    String phoneNumber,
+    Map<String, dynamic> orderData,
+  ) async {
+    return _http.post('/caller-profiles/$phoneNumber/orders', data: orderData);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Escalation Config (v0.3.0 — Issue #2870)
+  // ---------------------------------------------------------------------------
+
+  /// Get voice agent escalation config (transfer targets, sentiment threshold).
+  Future<Map<String, dynamic>> getEscalationConfig(String agentId) async {
+    return _http.get('/voice-agents/$agentId/escalation-config');
+  }
+
+  /// Update voice agent escalation config.
+  Future<Map<String, dynamic>> updateEscalationConfig(
+    String agentId,
+    Map<String, dynamic> config,
+  ) async {
+    return _http.put(
+      '/voice-agents/$agentId/escalation-config',
+      data: config,
+    );
+  }
+
+  /// Get voice agent business hours.
+  Future<Map<String, dynamic>> getBusinessHours(String agentId) async {
+    return _http.get('/voice-agents/$agentId/business-hours');
+  }
+
+  /// Update voice agent business hours.
+  Future<Map<String, dynamic>> updateBusinessHours(
+    String agentId,
+    Map<String, dynamic> hours,
+  ) async {
+    return _http.put('/voice-agents/$agentId/business-hours', data: hours);
+  }
 }

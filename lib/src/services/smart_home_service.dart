@@ -54,4 +54,59 @@ class OlympusSmartHomeService {
         json['rooms'] as List<dynamic>? ?? json['data'] as List<dynamic>? ?? [];
     return items.cast<Map<String, dynamic>>();
   }
+
+  // ---------------------------------------------------------------------------
+  // Scenes (v0.3.0 — Issue #2569)
+  // ---------------------------------------------------------------------------
+
+  /// List automation scenes (e.g., "Good morning", "Movie night").
+  Future<List<Map<String, dynamic>>> listScenes() async {
+    final json = await _http.get('/smart-home/scenes');
+    final items =
+        json['scenes'] as List<dynamic>? ??
+        json['data'] as List<dynamic>? ??
+        [];
+    return items.cast<Map<String, dynamic>>();
+  }
+
+  /// Activate a scene by ID.
+  Future<Map<String, dynamic>> activateScene(String sceneId) async {
+    return _http.post('/smart-home/scenes/$sceneId/activate');
+  }
+
+  /// Create a new scene with devices and actions.
+  Future<Map<String, dynamic>> createScene(Map<String, dynamic> scene) async {
+    return _http.post('/smart-home/scenes', data: scene);
+  }
+
+  /// Delete a scene.
+  Future<void> deleteScene(String sceneId) async {
+    await _http.delete('/smart-home/scenes/$sceneId');
+  }
+
+  // ---------------------------------------------------------------------------
+  // Automations
+  // ---------------------------------------------------------------------------
+
+  /// List automation rules (trigger-action).
+  Future<List<Map<String, dynamic>>> listAutomations() async {
+    final json = await _http.get('/smart-home/automations');
+    final items =
+        json['automations'] as List<dynamic>? ??
+        json['data'] as List<dynamic>? ??
+        [];
+    return items.cast<Map<String, dynamic>>();
+  }
+
+  /// Create a new automation rule.
+  Future<Map<String, dynamic>> createAutomation(
+    Map<String, dynamic> automation,
+  ) async {
+    return _http.post('/smart-home/automations', data: automation);
+  }
+
+  /// Delete an automation rule.
+  Future<void> deleteAutomation(String automationId) async {
+    await _http.delete('/smart-home/automations/$automationId');
+  }
 }

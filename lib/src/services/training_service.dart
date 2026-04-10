@@ -117,4 +117,62 @@ class OlympusTrainingService {
   Future<Map<String, dynamic>> reindexAll() async {
     return _http.post('/training/reindex');
   }
+
+  // ---------------------------------------------------------------------------
+  // Menu Translations (v0.3.0 — Issue #2869)
+  // ---------------------------------------------------------------------------
+
+  /// Trigger AI translation of menu items into a language.
+  /// Uses Ether AI (Gemini Flash) for restaurant-context-aware translation.
+  Future<Map<String, dynamic>> generateTranslations(String language) async {
+    return _http.post(
+      '/training/translations/generate',
+      data: {'language': language},
+    );
+  }
+
+  /// Get translations for a language (paginated, includes approval status).
+  Future<Map<String, dynamic>> getTranslations(
+    String language, {
+    int limit = 50,
+    int offset = 0,
+  }) async {
+    return _http.get(
+      '/training/translations/$language',
+      queryParameters: {'limit': limit, 'offset': offset},
+    );
+  }
+
+  /// Update a single translation (resets approval flag).
+  Future<Map<String, dynamic>> updateTranslation(
+    String language,
+    String itemId,
+    Map<String, dynamic> translation,
+  ) async {
+    return _http.put(
+      '/training/translations/$language/$itemId',
+      data: translation,
+    );
+  }
+
+  /// Bulk-approve all unapproved translations for a language.
+  Future<Map<String, dynamic>> approveTranslations(
+    String language, {
+    required String userId,
+  }) async {
+    return _http.post(
+      '/training/translations/$language/approve',
+      data: {'user_id': userId},
+    );
+  }
+
+  /// Delete all translations for a language.
+  Future<void> deleteTranslations(String language) async {
+    await _http.delete('/training/translations/$language');
+  }
+
+  /// List supported languages for translation.
+  Future<Map<String, dynamic>> listSupportedLanguages() async {
+    return _http.get('/training/translations');
+  }
 }

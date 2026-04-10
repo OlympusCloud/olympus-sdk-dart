@@ -5,11 +5,14 @@ import 'services/agent_service.dart';
 import 'services/ai_service.dart';
 import 'services/auth_service.dart';
 import 'services/billing_service.dart';
+import 'services/business_service.dart';
 import 'services/commerce_service.dart';
 import 'services/connect_service.dart';
+import 'services/creator_service.dart';
 import 'services/data_service.dart';
-import 'services/ether_service.dart';
+import 'services/developer_service.dart';
 import 'services/devices_service.dart';
+import 'services/ether_service.dart';
 import 'services/events_service.dart';
 import 'services/gating_service.dart';
 import 'services/genui_service.dart';
@@ -17,9 +20,12 @@ import 'services/health_service.dart';
 import 'services/identity_service.dart';
 import 'services/live_activity_service.dart';
 import 'services/marketplace_service.dart';
+import 'services/maximus_service.dart';
 import 'services/notify_service.dart';
 import 'services/observe_service.dart';
 import 'services/pay_service.dart';
+import 'services/platform_service.dart';
+import 'services/pos_service.dart';
 import 'services/skills_service.dart';
 import 'services/smart_home_service.dart';
 import 'services/storage_service.dart';
@@ -104,6 +110,12 @@ class OlympusClient {
   OlympusWebhookService? _webhooks;
   OlympusGenerativeUiService? _genui;
   OlympusAgentService? _agent;
+  OlympusCreatorService? _creator;
+  OlympusPlatformService? _platform;
+  OlympusDeveloperService? _developer;
+  OlympusBusinessService? _business;
+  OlympusMaximusService? _maximus;
+  OlympusPosService? _pos;
 
   /// Authentication, user management, and API keys.
   OlympusAuthService get auth => _auth ??= OlympusAuthService(_http);
@@ -211,6 +223,29 @@ class OlympusClient {
   /// LangGraph agent service: chat with optional approval gating, content
   /// suggestions, upsell ideas, and OTA self-healing UI patch dispatch.
   OlympusAgentService get agent => _agent ??= OlympusAgentService(_http);
+
+  /// Creator platform: posts, media, episodes, profile, analytics, team,
+  /// AI content generation, social posts, shows (v0.3.0).
+  OlympusCreatorService get creator =>
+      _creator ??= OlympusCreatorService(_http);
+
+  /// Platform operations: tenant signup/cleanup workflows, lifecycle (v0.3.0).
+  OlympusPlatformService get platform =>
+      _platform ??= OlympusPlatformService(_http);
+
+  /// Developer Platform: API keys, DevBox sandboxes, canary deployments (v0.3.0).
+  OlympusDeveloperService get developer =>
+      _developer ??= OlympusDeveloperService(_http);
+
+  /// Business data access: revenue, staff, insights for owner dashboards (v0.3.0).
+  OlympusBusinessService get business =>
+      _business ??= OlympusBusinessService(_http);
+
+  /// Maximus consumer AI assistant: voice, calendar, email, subscription (v0.3.0).
+  OlympusMaximusService get maximus => _maximus ??= OlympusMaximusService(_http);
+
+  /// POS integration: voice order routing to Square/Toast/Clover (v0.3.0).
+  OlympusPosService get pos => _pos ??= OlympusPosService(_http);
 
   // ---------------------------------------------------------------------------
   // Configuration accessors
