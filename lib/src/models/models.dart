@@ -11,3 +11,4 @@ export 'identity_models.dart';
 export 'marketplace_models.dart';
 export 'observe_models.dart';
 export 'pay_models.dart';
+export 'voice_option.dart';

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../http_client.dart';
+import '../models/voice_option.dart';
 
 /// Voice AI platform: agent configs, conversations, campaigns, phone numbers,
 /// marketplace voices, calls, speaker profiles, analytics, and edge voice
@@ -13,6 +14,14 @@ class OlympusVoiceService {
   OlympusVoiceService(this._http);
 
   final OlympusHttpClient _http;
+
+  /// In-memory cache for the voice library (#81).
+  ///
+  /// The voice catalog rarely changes (prebuilt Gemini voices), so we cache
+  /// the response for the lifetime of the SDK instance to keep the voice
+  /// picker snappy and reduce gateway calls. Call [clearVoiceLibraryCache]
+  /// if you need to force a refetch.
+  List<VoiceOption>? _voiceLibraryCache;
 
   // ---------------------------------------------------------------------------
   // Agents
@@ -249,11 +258,83 @@ class OlympusVoiceService {
   }
 
   // ---------------------------------------------------------------------------
+  // Voice Library (v0.3.1 — Issue #81)
+  // ---------------------------------------------------------------------------
+
+  /// List the 8 prebuilt Gemini Live voices available for phone agents.
+  ///
+  /// Each [VoiceOption] includes an `id`, display `name`, `gender`,
+  /// marketing `description`, and a public `sampleUrl` pointing to a
+  /// 5-second preview clip. The response is cached in-memory per SDK
+  /// instance since the catalog rarely changes. Pass
+  /// [forceRefresh]`: true` to bypass the cache.
+  ///
+  /// Routes to `GET /v1/voice/voices` which proxies to the Python
+  /// `/api/ether/voice/voices` endpoint with 1-hour edge caching.
+  Future<List<VoiceOption>> listVoices({bool forceRefresh = false}) async {
+    if (!forceRefresh && _voiceLibraryCache != null) {
+      return List<VoiceOption>.unmodifiable(_voiceLibraryCache!);
+    }
+    final json = await _http.get('/voice/voices');
+    final items =
+        json['voices'] as List<dynamic>? ??
+        json['data'] as List<dynamic>? ??
+        <dynamic>[];
+    final voices = items
+        .whereType<Map<String, dynamic>>()
+        .map(VoiceOption.fromJson)
+        .toList(growable: false);
+    _voiceLibraryCache = voices;
+    return List<VoiceOption>.unmodifiable(voices);
+  }
+
+  /// Clear the in-memory voice library cache.
+  ///
+  /// Forces the next [listVoices] call to refetch from the server. Useful
+  /// during development / tests.
+  void clearVoiceLibraryCache() {
+    _voiceLibraryCache = null;
+  }
+
+  /// Update the voice used by a voice agent.
+  ///
+  /// Sets the Gemini Live voice name (e.g. `Kore`, `Aoede`, `Puck`) on the
+  /// agent config. The platform persists the choice in
+  /// `voice_agent_configs.voice_profile` and regenerates any cached
+  /// greeting audio. The new voice takes effect on the next phone call.
+  ///
+  /// Routes to `PUT /v1/ether/voice/agents/{agentId}/voice` with body
+  /// `{voice_name}`.
+  Future<void> updateAgentVoice(String agentId, String voiceName) async {
+    await _http.put(
+      '/ether/voice/agents/$agentId/voice',
+      data: {'voice_name': voiceName},
+    );
+  }
+
+  /// Return the Gemini Live voice name currently assigned to [agentId].
+  ///
+  /// Falls back to `Kore` (the platform default) if the agent has no
+  /// explicit voice_profile configured.
+  ///
+  /// Routes to `GET /v1/ether/voice/agents/{agentId}/voice`.
+  Future<String> getAgentVoice(String agentId) async {
+    final json = await _http.get('/ether/voice/agents/$agentId/voice');
+    final name = json['voice_name'] ?? json['voiceName'];
+    if (name is String && name.isNotEmpty) return name;
+    return 'Kore';
+  }
+
+  // ---------------------------------------------------------------------------
   // Marketplace (Voices & Packs)
   // ---------------------------------------------------------------------------
 
   /// List available voices in the marketplace.
-  Future<List<Map<String, dynamic>>> listVoices({
+  ///
+  /// This targets the community/paid voice marketplace
+  /// (`/voice/marketplace/voices`). For the built-in 8 Gemini Live voices,
+  /// use [listVoices] instead.
+  Future<List<Map<String, dynamic>>> listMarketplaceVoices({
     String? language,
     String? gender,
     int? limit,

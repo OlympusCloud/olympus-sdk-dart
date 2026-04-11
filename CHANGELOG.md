@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.3.1 (2026-04-11)
+
+### Voice Library (Issue #81)
+
+Tenants can now pick which of the 8 prebuilt Gemini Live voices their
+phone agent uses. Voice is the strongest brand signal on a phone call —
+a steakhouse and a bubble tea shop should not sound the same.
+
+- **New model** — `VoiceOption` with `{id, name, gender, description, sampleUrl}`.
+- **`oc.voice.listVoices()`** — returns `List<VoiceOption>` for the 8 Gemini
+  voices (Kore, Aoede, Leda, Puck, Charon, Fenrir, Orus, Zephyr), cached
+  in-memory. Each voice ships with a 5-second sample clip hosted on R2 so
+  apps can preview before selecting. Pass `forceRefresh: true` to bypass
+  the cache.
+- **`oc.voice.updateAgentVoice(agentId, voiceName)`** — persists the chosen
+  voice to `voice_agent_configs.voice_profile`. Takes effect on the next
+  inbound call.
+- **`oc.voice.getAgentVoice(agentId)`** — returns the current voice name,
+  falling back to `Kore` if none configured.
+- **`oc.voice.clearVoiceLibraryCache()`** — clear the in-memory catalog cache.
+
+### Breaking: `listVoices` signature change
+
+The previous `oc.voice.listVoices()` targeted the community voice
+marketplace and returned `List<Map<String, dynamic>>`. It has been renamed
+to **`listMarketplaceVoices()`** with an identical signature. The new
+`listVoices()` returns `List<VoiceOption>` for the built-in Gemini
+library. No apps in the workspace called the old method, but third-party
+apps upgrading from 0.3.0 should rename their calls.
+
 ## 0.3.0 (2026-04-10)
 
 ### New Services (6)
