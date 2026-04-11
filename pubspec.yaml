@@ -6,7 +6,7 @@ description: >
   Identity (cross-tenant SSO), Vision (AR/3D/recognition), Wearable
   (WearOS/watchOS), Generative UI (self-healing OTA), Live Activities,
   and more.
-version: 0.3.1
+version: 0.3.2
 publish_to: "none"
 
 environment:

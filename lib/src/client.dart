@@ -31,6 +31,7 @@ import 'services/smart_home_service.dart';
 import 'services/storage_service.dart';
 import 'services/training_service.dart';
 import 'services/vision_service.dart';
+import 'services/voice_profile_service.dart';
 import 'services/voice_service.dart';
 import 'services/wearable_service.dart';
 import 'services/webhook_service.dart';
@@ -97,6 +98,7 @@ class OlympusClient {
   OlympusEtherService? _ether;
   OlympusObserveService? _observe;
   OlympusVoiceService? _voice;
+  OlympusVoiceProfileService? _voiceProfile;
   OlympusWorkflowService? _workflows;
   OlympusHealthService? _health;
   OlympusIdentityService? _identity;
@@ -171,6 +173,10 @@ class OlympusClient {
 
   /// Voice AI: agents, conversations, campaigns, phone numbers, and profiles.
   OlympusVoiceService get voice => _voice ??= OlympusVoiceService(_http);
+
+  /// Voice customization profile: pitch, rate, warmth, formality (v0.3.2, #82).
+  OlympusVoiceProfileService get voiceProfile =>
+      _voiceProfile ??= OlympusVoiceProfileService(_http);
 
   /// Webhook management: register endpoints, delivery status, and testing.
   OlympusWebhookService get webhooks =>

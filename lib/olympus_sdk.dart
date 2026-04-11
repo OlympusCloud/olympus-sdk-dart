@@ -62,6 +62,7 @@ export 'src/services/smart_home_service.dart';
 export 'src/services/storage_service.dart';
 export 'src/services/training_service.dart';
 export 'src/services/vision_service.dart';
+export 'src/services/voice_profile_service.dart';
 export 'src/services/voice_service.dart';
 export 'src/services/wearable_service.dart';
 export 'src/services/webhook_service.dart';

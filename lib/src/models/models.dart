@@ -12,3 +12,4 @@ export 'marketplace_models.dart';
 export 'observe_models.dart';
 export 'pay_models.dart';
 export 'voice_option.dart';
+export 'voice_profile.dart';

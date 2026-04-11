@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.3.2 (2026-04-11)
+
+### Voice Customization (Issue #82)
+
+Tenants can now fine-tune their selected voice with four sliders:
+
+- **`pitch`** (0.5–2.0, default 1.0) — perceived voice height.
+- **`rate`** (0.5–2.0, default 1.0) — speaking speed.
+- **`warmth`** (0.0–1.0, default 0.7) — friendliness/casualness hint.
+- **`formality`** (0.0–1.0, default 0.5) — professional vs casual hint.
+
+New model `VoiceProfile` plus `VoiceProfileBounds` (clamp helpers), and
+a new service accessor `oc.voiceProfile` with `getVoiceProfile(agentId)`,
+`updateVoiceProfile(agentId, profile)`, and `resetVoiceProfile(agentId)`.
+
+Pitch and rate are applied to cached TTS via SSML prosody tags. Warmth
+and formality are injected as tone hints into the Gemini Live voice
+persona preamble (Gemini Live does not natively accept pitch/rate).
+
 ## 0.3.1 (2026-04-11)
 
 ### Voice Library (Issue #81)
