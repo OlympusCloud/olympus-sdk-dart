@@ -33,6 +33,7 @@ export 'src/http_client.dart'
 export 'src/models/models.dart';
 export 'src/services/ads_service.dart';
 export 'src/services/agent_service.dart';
+export 'src/services/agent_workflow_service.dart';
 export 'src/services/ai_service.dart';
 export 'src/services/auth_service.dart';
 export 'src/services/billing_service.dart';

@@ -24,10 +24,23 @@ class OlympusAiService {
   /// Send a single-turn prompt to the AI gateway.
   ///
   /// [tier] selects the model tier (T1-T6). Defaults to server-selected tier.
+  ///
+  /// [requiredCapabilities] activates capability-based routing (#2919). When
+  /// set to a non-text capability set, the request bypasses the text tier
+  /// selector and routes directly to the cheapest model matching the
+  /// capabilities in the Ether catalog. Examples:
+  ///   - `['image_generation']` → Flux Schnell (free) / DALL-E 3 / Imagen 4
+  ///   - `['video_generation']` → Veo 3.1 / Kling 2.0 / Runway Gen-4
+  ///   - `['medical_specialist', 'reasoning']` → Med-Gemini / Hippocratic
+  ///   - `['legal_specialist']` → Harvey / Lexis+ AI
+  ///   - `['agentic_coding']` → Codex GPT-5.4 / Qwen Coder / DeepSeek Coder
+  ///   - `['world_model']` → Genie 3 / V-JEPA 2 / NVIDIA Cosmos
+  ///   - `['robotics_control']` → Gemini Robotics / π0 / Figure Helix
   Future<AiResponse> query(
     String prompt, {
     String? tier,
     Map<String, dynamic>? context,
+    List<String>? requiredCapabilities,
   }) async {
     final json = await _http.post(
       '/ai/chat',
@@ -37,6 +50,79 @@ class OlympusAiService {
         ],
         'tier': ?tier,
         'context': ?context,
+        'required_capabilities': ?requiredCapabilities,
+      },
+    );
+    return AiResponse.fromJson(json);
+  }
+
+  /// Generate an image from a text prompt using the cheapest matching
+  /// provider in the Ether catalog (Flux Schnell / DALL-E 3 / Imagen 4).
+  ///
+  /// Returns a map with `image_url` or `image_b64` depending on provider.
+  Future<Map<String, dynamic>> generateImage(
+    String prompt, {
+    String? preferredProvider,
+  }) async {
+    return _http.post(
+      '/ai/chat',
+      data: {
+        'messages': [
+          {'role': 'user', 'content': prompt},
+        ],
+        'required_capabilities': ['image_generation'],
+        if (preferredProvider != null) 'preferred_provider': preferredProvider,
+      },
+    );
+  }
+
+  /// Generate a video from a text prompt using the cheapest matching
+  /// provider (Veo / Kling / Pika / Luma / Hailuo). Returns async job
+  /// reference — poll `/ai/video-jobs/:id` for completion.
+  Future<Map<String, dynamic>> generateVideo(
+    String prompt, {
+    int? durationSeconds,
+    String? preferredProvider,
+  }) async {
+    return _http.post(
+      '/ai/chat',
+      data: {
+        'messages': [
+          {'role': 'user', 'content': prompt},
+        ],
+        'required_capabilities': ['video_generation'],
+        if (durationSeconds != null) 'duration_seconds': durationSeconds,
+        if (preferredProvider != null) 'preferred_provider': preferredProvider,
+      },
+    );
+  }
+
+  /// Call a vertical specialist model by capability (medical, legal,
+  /// financial, scientific). Routes to Med-Gemini, Harvey, BloombergGPT,
+  /// ESM-3, etc. based on the specialty flag.
+  Future<AiResponse> specialistQuery(
+    String prompt,
+    String specialty, {
+    String? context,
+  }) async {
+    final caps = <String>[
+      'reasoning',
+      switch (specialty) {
+        'medical' => 'medical_specialist',
+        'legal' => 'legal_specialist',
+        'financial' => 'financial_specialist',
+        'scientific' => 'scientific_specialist',
+        _ => 'text',
+      },
+    ];
+    final json = await _http.post(
+      '/ai/chat',
+      data: {
+        'messages': [
+          if (context != null) {'role': 'system', 'content': context},
+          {'role': 'user', 'content': prompt},
+        ],
+        'required_capabilities': caps,
       },
     );
     return AiResponse.fromJson(json);

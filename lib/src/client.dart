@@ -2,6 +2,7 @@ import 'config.dart';
 import 'http_client.dart';
 import 'services/ads_service.dart';
 import 'services/agent_service.dart';
+import 'services/agent_workflow_service.dart';
 import 'services/ai_service.dart';
 import 'services/auth_service.dart';
 import 'services/billing_service.dart';
@@ -98,6 +99,7 @@ class OlympusClient {
   OlympusObserveService? _observe;
   OlympusVoiceService? _voice;
   OlympusWorkflowService? _workflows;
+  OlympusAgentWorkflowService? _agentWorkflows;
   OlympusHealthService? _health;
   OlympusIdentityService? _identity;
   LiveActivityService? _liveActivity;
@@ -176,9 +178,16 @@ class OlympusClient {
   OlympusWebhookService get webhooks =>
       _webhooks ??= OlympusWebhookService(_http);
 
-  /// Workflow automation: create, manage, and execute workflows.
+  /// Marketplace workflow templates: install and run pre-built automations.
   OlympusWorkflowService get workflows =>
       _workflows ??= OlympusWorkflowService(_http);
+
+  /// AI Agent Workflow Orchestration (#2915): tenant-scoped multi-agent DAG
+  /// pipelines with cron/event triggers, capability routing, and per-tier
+  /// billing. Distinct from `workflows` which is the marketplace template
+  /// service. Use this for custom agent pipelines on the Olympus AI platform.
+  OlympusAgentWorkflowService get agentWorkflows =>
+      _agentWorkflows ??= OlympusAgentWorkflowService(_http);
 
   /// Health integrations: providers, sync, and insights.
   OlympusHealthService get health => _health ??= OlympusHealthService(_http);
