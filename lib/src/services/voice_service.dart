@@ -485,10 +485,7 @@ class OlympusVoiceService {
     String agentId,
     Map<String, dynamic> config,
   ) async {
-    return _http.put(
-      '/voice-agents/$agentId/escalation-config',
-      data: config,
-    );
+    return _http.put('/voice-agents/$agentId/escalation-config', data: config);
   }
 
   /// Get voice agent business hours.
@@ -502,5 +499,330 @@ class OlympusVoiceService {
     Map<String, dynamic> hours,
   ) async {
     return _http.put('/voice-agents/$agentId/business-hours', data: hours);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Self-service Agent CRUD (v0.4.0 — epic OlympusCloud/orderecho-ai#119)
+  // ---------------------------------------------------------------------------
+  // The methods below back the OrderEcho Agent Editor: list/clone/duplicate
+  // agents, instantiate from templates, preview voices, manage personas, and
+  // configure background ambiance — all so tenants never need a code change
+  // to roll out a new restaurant or tweak a voice character.
+
+  /// List all voice agents for the current tenant.
+  ///
+  /// Aliased to [listConfigs] for naming clarity in the Agent Editor; both
+  /// hit the same `/voice-agents/configs` endpoint.
+  Future<List<Map<String, dynamic>>> listAgents({int? page, int? limit}) =>
+      listConfigs(page: page, limit: limit);
+
+  /// Get a single agent by ID. Alias for [getConfig].
+  Future<Map<String, dynamic>> getAgent(String agentId) => getConfig(agentId);
+
+  /// Create a new voice agent.
+  ///
+  /// When [fromTemplateId] is set, the new agent is initialized from the
+  /// referenced template (persona, voice, greeting, escalation, ambiance,
+  /// voice overrides) and only top-level fields like [name] / [phoneNumber]
+  /// / [locationId] need to be supplied. Otherwise the agent is created
+  /// from scratch and all fields default to platform values.
+  Future<Map<String, dynamic>> createAgent({
+    String? fromTemplateId,
+    String? name,
+    String? voiceId,
+    String? persona,
+    String? greeting,
+    String? phoneNumber,
+    String? locationId,
+    Map<String, dynamic>? ambianceConfig,
+    Map<String, dynamic>? voiceOverrides,
+    Map<String, dynamic>? businessHours,
+    List<Map<String, dynamic>>? escalationRules,
+  }) async {
+    return _http.post(
+      '/voice-agents/configs',
+      data: {
+        if (fromTemplateId != null) 'from_template_id': fromTemplateId,
+        if (name != null) 'name': name,
+        if (voiceId != null) 'voice_id': voiceId,
+        if (persona != null) 'persona': persona,
+        if (greeting != null) 'greeting': greeting,
+        if (phoneNumber != null) 'phone_number': phoneNumber,
+        if (locationId != null) 'location_id': locationId,
+        if (ambianceConfig != null) 'ambiance_config': ambianceConfig,
+        if (voiceOverrides != null) 'voice_overrides': voiceOverrides,
+        if (businessHours != null) 'business_hours': businessHours,
+        if (escalationRules != null) 'escalation_rules': escalationRules,
+      },
+    );
+  }
+
+  /// Update mutable fields on an existing agent. Any non-null field is set;
+  /// nulls are left unchanged on the server side.
+  Future<Map<String, dynamic>> updateAgent(
+    String agentId, {
+    String? name,
+    String? voiceId,
+    String? persona,
+    String? greeting,
+    Map<String, dynamic>? ambianceConfig,
+    Map<String, dynamic>? voiceOverrides,
+    Map<String, dynamic>? businessHours,
+    List<Map<String, dynamic>>? escalationRules,
+    bool? isActive,
+  }) async {
+    return _http.put(
+      '/voice-agents/configs/$agentId',
+      data: {
+        if (name != null) 'name': name,
+        if (voiceId != null) 'voice_id': voiceId,
+        if (persona != null) 'persona': persona,
+        if (greeting != null) 'greeting': greeting,
+        if (ambianceConfig != null) 'ambiance_config': ambianceConfig,
+        if (voiceOverrides != null) 'voice_overrides': voiceOverrides,
+        if (businessHours != null) 'business_hours': businessHours,
+        if (escalationRules != null) 'escalation_rules': escalationRules,
+        if (isActive != null) 'is_active': isActive,
+      },
+    );
+  }
+
+  /// Delete a voice agent. Alias for [deleteConfig].
+  Future<void> deleteAgent(String agentId) => deleteConfig(agentId);
+
+  /// Clone an existing agent. The new agent inherits persona, voice, greeting,
+  /// escalation, ambiance and voice overrides from the source — only the
+  /// name and phone number are reset.
+  Future<Map<String, dynamic>> cloneAgent(
+    String agentId, {
+    String? newName,
+    String? phoneNumber,
+    String? locationId,
+  }) async {
+    return _http.post(
+      '/voice-agents/configs/$agentId/clone',
+      data: {
+        if (newName != null) 'new_name': newName,
+        if (phoneNumber != null) 'phone_number': phoneNumber,
+        if (locationId != null) 'location_id': locationId,
+      },
+    );
+  }
+
+  /// Generate a TTS preview clip for an agent so the editor can audition the
+  /// current voice + persona without making a real call.
+  ///
+  /// Returns `{audio_url, audio_base64?, format, duration_ms}`. Useful for
+  /// the Voice tab "preview" button in the Agent Editor.
+  Future<Map<String, dynamic>> previewAgentVoice(
+    String agentId, {
+    required String sampleText,
+    String? voiceId,
+    Map<String, dynamic>? voiceOverrides,
+  }) async {
+    return _http.post(
+      '/voice-agents/configs/$agentId/preview',
+      data: {
+        'sample_text': sampleText,
+        if (voiceId != null) 'voice_id': voiceId,
+        if (voiceOverrides != null) 'voice_overrides': voiceOverrides,
+      },
+    );
+  }
+
+  /// List the catalog of available Gemini Live voices (Aoede, Charon, Fenrir,
+  /// Kore, Leda, Orus, Puck, Zephyr) plus any tenant-installed marketplace
+  /// voices. Each entry includes a sample URL the editor can play inline.
+  ///
+  /// Use this in the Agent Editor's Voice tab to populate the voice picker.
+  Future<List<Map<String, dynamic>>> listGeminiVoices({
+    String? language,
+  }) async {
+    final json = await _http.get(
+      '/voice/voices',
+      queryParameters: {if (language != null) 'language': language},
+    );
+    final items =
+        json['voices'] as List<dynamic>? ??
+        json['data'] as List<dynamic>? ??
+        [];
+    return items.cast<Map<String, dynamic>>();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Persona library
+  // ---------------------------------------------------------------------------
+
+  /// List curated voice personas. Filter by [category] (e.g.
+  /// `hospitality_casual`, `hospitality_polished`, `retail_friendly`) or
+  /// [industry] (e.g. `restaurant`, `bar`, `cafe`).
+  Future<List<Map<String, dynamic>>> listPersonas({
+    String? category,
+    String? industry,
+    bool? premiumOnly,
+  }) async {
+    final json = await _http.get(
+      '/voice/personas',
+      queryParameters: {
+        if (category != null) 'category': category,
+        if (industry != null) 'industry': industry,
+        if (premiumOnly != null) 'premium_only': premiumOnly.toString(),
+      },
+    );
+    final items =
+        json['personas'] as List<dynamic>? ??
+        json['data'] as List<dynamic>? ??
+        [];
+    return items.cast<Map<String, dynamic>>();
+  }
+
+  /// Get a single persona by ID or slug.
+  Future<Map<String, dynamic>> getPersona(String idOrSlug) async {
+    return _http.get('/voice/personas/$idOrSlug');
+  }
+
+  /// Apply a persona to an existing agent. Copies persona text, voice ID,
+  /// and suggested voice overrides from the persona into the agent in one
+  /// atomic update. Returns the updated agent.
+  Future<Map<String, dynamic>> applyPersonaToAgent(
+    String agentId,
+    String personaIdOrSlug,
+  ) async {
+    return _http.post(
+      '/voice-agents/configs/$agentId/apply-persona',
+      data: {'persona': personaIdOrSlug},
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Templates (full agent templates — distinct from voice marketplace voices)
+  // ---------------------------------------------------------------------------
+
+  /// List voice agent templates. Use [scope] = `tenant` for the current
+  /// tenant's private template library, `global` for the platform-wide
+  /// shared library, or omit for both.
+  Future<List<Map<String, dynamic>>> listAgentTemplates({String? scope}) async {
+    final json = await _http.get(
+      '/voice-agents/templates',
+      queryParameters: {if (scope != null) 'scope': scope},
+    );
+    final items =
+        json['templates'] as List<dynamic>? ??
+        json['data'] as List<dynamic>? ??
+        [];
+    return items.cast<Map<String, dynamic>>();
+  }
+
+  /// Instantiate a new agent from an existing template.
+  Future<Map<String, dynamic>> instantiateAgentTemplate(
+    String templateId, {
+    required String name,
+    String? phoneNumber,
+    String? locationId,
+  }) async {
+    return _http.post(
+      '/voice-agents/templates/$templateId/instantiate',
+      data: {
+        'name': name,
+        if (phoneNumber != null) 'phone_number': phoneNumber,
+        if (locationId != null) 'location_id': locationId,
+      },
+    );
+  }
+
+  /// Publish the current agent as a tenant- or globally-visible template.
+  /// [scope] = `tenant` keeps it private, `global` requires platform approval.
+  Future<Map<String, dynamic>> publishAgentAsTemplate(
+    String agentId, {
+    required String scope,
+    String? description,
+  }) async {
+    return _http.post(
+      '/voice-agents/configs/$agentId/publish-template',
+      data: {
+        'scope': scope,
+        if (description != null) 'description': description,
+      },
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Background ambiance
+  // ---------------------------------------------------------------------------
+
+  /// List the curated library of ambient beds (busy pizza place, quiet cafe,
+  /// drive-thru, hotel lobby, etc.). Each entry includes a sample URL plus
+  /// a recommended intensity (0..1).
+  Future<List<Map<String, dynamic>>> listAmbianceLibrary({
+    String? category,
+  }) async {
+    final json = await _http.get(
+      '/voice/ambiance/library',
+      queryParameters: {if (category != null) 'category': category},
+    );
+    final items =
+        json['beds'] as List<dynamic>? ?? json['data'] as List<dynamic>? ?? [];
+    return items.cast<Map<String, dynamic>>();
+  }
+
+  /// Upload a custom ambient bed (mulaw 8kHz mono, looped, ~30 seconds).
+  /// Returns `{r2_key, url, duration_ms}` for the uploaded asset.
+  ///
+  /// The [audioBytes] should be base64-encoded mulaw — the platform validates
+  /// format on receipt and rejects anything that isn't loopable.
+  Future<Map<String, dynamic>> uploadAmbianceBed(
+    List<int> audioBytes, {
+    required String name,
+    String? timeOfDay,
+    String? description,
+  }) async {
+    return _http.post(
+      '/voice/ambiance/upload',
+      data: {
+        'name': name,
+        'audio_base64': base64Encode(audioBytes),
+        if (timeOfDay != null) 'time_of_day': timeOfDay,
+        if (description != null) 'description': description,
+      },
+    );
+  }
+
+  /// Update an agent's ambiance configuration.
+  Future<Map<String, dynamic>> updateAgentAmbiance(
+    String agentId, {
+    bool? enabled,
+    double? intensity,
+    String? defaultR2Key,
+    Map<String, String>? timeOfDayVariants,
+  }) async {
+    return _http.patch(
+      '/voice-agents/configs/$agentId/ambiance',
+      data: {
+        if (enabled != null) 'enabled': enabled,
+        if (intensity != null) 'intensity': intensity,
+        if (defaultR2Key != null) 'default_r2_key': defaultR2Key,
+        if (timeOfDayVariants != null)
+          'time_of_day_variants': timeOfDayVariants,
+      },
+    );
+  }
+
+  /// Update an agent's voice tuning overrides (pitch, speed, warmth, dialect).
+  Future<Map<String, dynamic>> updateAgentVoiceOverrides(
+    String agentId, {
+    double? pitch,
+    double? speed,
+    double? warmth,
+    String? regionalDialect,
+  }) async {
+    return _http.patch(
+      '/voice-agents/configs/$agentId/voice-overrides',
+      data: {
+        if (pitch != null) 'pitch': pitch,
+        if (speed != null) 'speed': speed,
+        if (warmth != null) 'warmth': warmth,
+        if (regionalDialect != null) 'regional_dialect': regionalDialect,
+      },
+    );
   }
 }

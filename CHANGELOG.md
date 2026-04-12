@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.4.0 (2026-04-12)
+
+### Voice Agent Self-Service (epic OlympusCloud/orderecho-ai#119)
+
+`oc.voice` extended with the methods that back the OrderEcho Agent Editor.
+Restaurants now manage every aspect of their voice agents from the app —
+voice character, persona, ambient background sound, voice tuning, templates
+and clones — without any code changes.
+
+**New methods:**
+- `listAgents`, `getAgent`, `createAgent`, `updateAgent`, `deleteAgent`,
+  `cloneAgent` — full agent CRUD aliased on `/voice-agents/configs/*`
+- `previewAgentVoice(agentId, sampleText, voiceId?, voiceOverrides?)` —
+  generate a TTS sample for the editor's voice picker without making a call
+- `listGeminiVoices()` — Gemini Live voice catalog (Aoede, Charon, Fenrir,
+  Kore, Leda, Orus, Puck, Zephyr) plus tenant marketplace voices, each with
+  a sample audio URL
+- `listPersonas({category, industry, premiumOnly})` — curated voice persona
+  library (Italian-American line cook, Tampa friendly host, casual bartender,
+  fine-dining host, coffee shop barista...)
+- `getPersona(idOrSlug)`, `applyPersonaToAgent(agentId, personaIdOrSlug)`
+- `listAgentTemplates({scope})`, `instantiateAgentTemplate`,
+  `publishAgentAsTemplate` — agent template lifecycle (tenant-private and
+  global scopes)
+- `listAmbianceLibrary({category})`, `uploadAmbianceBed(audio, name, ...)` —
+  background ambient bed catalog and custom upload
+- `updateAgentAmbiance(agentId, {enabled, intensity, defaultR2Key,
+  timeOfDayVariants})` — per-agent ambiance configuration
+- `updateAgentVoiceOverrides(agentId, {pitch, speed, warmth,
+  regionalDialect})` — voice tuning sliders
+
+**Backing platform changes:** new `voice_agent_configs.ambiance_config` and
+`voice_agent_configs.voice_overrides` JSON columns plus `voice_personas`
+table seeded with 5 starter personas. See platform commit `d8d60cccf`.
+
 ## 0.3.0 (2026-04-10)
 
 ### New Services (6)
