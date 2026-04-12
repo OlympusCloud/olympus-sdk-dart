@@ -175,4 +175,34 @@ class OlympusTrainingService {
   Future<Map<String, dynamic>> listSupportedLanguages() async {
     return _http.get('/training/translations');
   }
+
+  /// AI-suggested modifier groups for a menu item.
+  Future<Map<String, dynamic>> suggestModifiers({
+    required String itemName,
+    String? description,
+    String? category,
+    String? cuisineType,
+  }) async {
+    return _http.post('/training/suggest-modifiers', data: {
+      'item_name': itemName,
+      if (description != null) 'description': description,
+      if (category != null) 'category': category,
+      if (cuisineType != null) 'cuisine_type': cuisineType,
+    });
+  }
+
+  /// AI-designed voice ordering workflow.
+  Future<Map<String, dynamic>> suggestWorkflow({
+    String? tenantId,
+    String cuisineType = 'pizza',
+    List<String> goals = const ['maximize_aov', 'high_accuracy'],
+    String? menuSummary,
+  }) async {
+    return _http.post('/training/suggest-workflow', data: {
+      if (tenantId != null) 'tenant_id': tenantId,
+      'cuisine_type': cuisineType,
+      'goals': goals,
+      if (menuSummary != null) 'menu_summary': menuSummary,
+    });
+  }
 }

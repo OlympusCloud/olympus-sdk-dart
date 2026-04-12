@@ -150,4 +150,69 @@ class OlympusCommerceService {
   Future<void> deleteCatalogItem(String itemId) async {
     await _http.delete('/central-menu/items/$itemId');
   }
+
+  // ─── Menu Items (v2 with modifier groups) ────────────────────────────
+
+  /// List menu items with modifier group data.
+  Future<Map<String, dynamic>> listMenuItems({
+    String? categoryId,
+    int limit = 100,
+    int offset = 0,
+  }) async {
+    return _http.get('/menu/items', queryParameters: {
+      if (categoryId != null) 'category_id': categoryId,
+      'limit': limit,
+      'offset': offset,
+    });
+  }
+
+  /// Get a single menu item with full modifier groups.
+  Future<Map<String, dynamic>> getMenuItem(String itemId) async {
+    return _http.get('/menu/items/$itemId');
+  }
+
+  /// Create a menu item.
+  Future<Map<String, dynamic>> createMenuItem(Map<String, dynamic> data) async {
+    return _http.post('/menu/items', data: data);
+  }
+
+  /// Update a menu item.
+  Future<Map<String, dynamic>> updateMenuItem(String itemId, Map<String, dynamic> data) async {
+    return _http.put('/menu/items/$itemId', data: data);
+  }
+
+  /// Delete a menu item.
+  Future<void> deleteMenuItem(String itemId) async {
+    await _http.delete('/menu/items/$itemId');
+  }
+
+  /// Update the modifier groups linked to a menu item (strict set replacement).
+  Future<Map<String, dynamic>> updateItemModifierGroups(
+    String itemId,
+    List<Map<String, dynamic>> groups,
+  ) async {
+    return _http.put('/menu/items/$itemId/modifier-groups', data: groups);
+  }
+
+  // ─── Modifier Groups ────────────────────────────────────────────────
+
+  /// List tenant-scoped modifier groups.
+  Future<Map<String, dynamic>> listModifierGroups() async {
+    return _http.get('/menu/modifier-groups');
+  }
+
+  /// Create a new modifier group.
+  Future<Map<String, dynamic>> createModifierGroup(Map<String, dynamic> data) async {
+    return _http.post('/menu/modifier-groups', data: data);
+  }
+
+  /// Update a modifier group.
+  Future<Map<String, dynamic>> updateModifierGroup(String groupId, Map<String, dynamic> data) async {
+    return _http.put('/menu/modifier-groups/$groupId', data: data);
+  }
+
+  /// Delete a modifier group.
+  Future<void> deleteModifierGroup(String groupId) async {
+    await _http.delete('/menu/modifier-groups/$groupId');
+  }
 }
